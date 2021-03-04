@@ -1,10 +1,8 @@
 package gorm
 
 import (
-	/*
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/wissance/stringFormatter"*/
 	"github.com/jinzhu/gorm"
+	"github.com/wissance/stringFormatter"
 )
 
 type SqlDialect string
@@ -42,4 +40,21 @@ func CloseDb(db *gorm.DB) {
 
 func DropDb(systemDbConnStr string, dbName string, checkExists bool) {
 
+}
+
+func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string) *gorm.DB {
+	createStatementTemplate := "CREATE DATABASE {0}"
+	createStatement := stringFormatter.Format(createStatementTemplate, *dbName)
+
+	postgresDb, err := gorm.Open(string(dialect), *systemDbConnStr)
+	if err != nil {
+		return nil
+	}
+	postgresDb.Exec(createStatement)
+	postgresDb.Close()
+	db, err := gorm.Open(string(dialect), *dbConnStr)
+	if err != nil {
+		return nil
+	}
+	return db
 }
