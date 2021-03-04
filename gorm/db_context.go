@@ -7,6 +7,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+type SqlDialect string
+
+const (
+    Postgres SqlDialect = "postgres"
+    Mysql = "mysql"
+    Mssql = "mssql"
+    Sqlite = "sqlite"
+)
+
 func OpenDb(host string, port string, dbName string, dbUser string, password string,
 	        useSsl string, create bool) *gorm.DB {
     return nil
