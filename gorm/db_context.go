@@ -16,17 +16,17 @@ const (
     Sqlite = "sqlite"
 )
 
-func OpenDb(host string, port string, dbName string, dbUser string, password string,
+func OpenDb(dialect SqlDialect, host string, port string, dbName string, dbUser string, password string,
 	        useSsl string, create bool) *gorm.DB {
     return nil
 }
 
-func OpenDb2(connStr string, create bool) *gorm.DB {
+func OpenDb2(dialect SqlDialect, connStr string, create bool) *gorm.DB {
 	return nil
 }
 
-func CheckDb(dbConnStr *string) bool {
-	db, err := gorm.Open("postgres", *dbConnStr)
+func CheckDb(dialect SqlDialect, dbConnStr string) bool {
+	db, err := gorm.Open(string(dialect), dbConnStr)
 	if err == nil {
 		db.Close()
 		return true
