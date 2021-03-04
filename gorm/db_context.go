@@ -14,6 +14,8 @@ const (
     Sqlite = "sqlite"
 )
 
+const postrgresConnStrTemplate = "host={0} port={1} user={2} dbname={3} password={4} sslmode={5}"
+
 func OpenDb(dialect SqlDialect, host string, port string, dbName string, dbUser string, password string,
 	        useSsl string, create bool) *gorm.DB {
     return nil
@@ -42,16 +44,32 @@ func DropDb(systemDbConnStr string, dbName string, checkExists bool) {
 
 }
 
+func createConnStr(dialect SqlDialect, host string, port int, dbName string,
+	              dbUser string, password string, useSsl string) string {
+	connStr := ""
+	if dialect == Postgres {
+        connStr = stringFormatter.Format(postrgresConnStrTemplate, host, port, dbUser, dbName, password, useSsl)
+	} else if dialect == Mssql {
+
+	} else if dialect == Mysql {
+
+	} else if dialect == Sqlite {
+
+	}
+
+	return connStr
+}
+
 func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string) *gorm.DB {
 	createStatementTemplate := "CREATE DATABASE {0}"
 	createStatement := stringFormatter.Format(createStatementTemplate, *dbName)
 
-	postgresDb, err := gorm.Open(string(dialect), *systemDbConnStr)
+	systemDb, err := gorm.Open(string(dialect), *systemDbConnStr)
 	if err != nil {
 		return nil
 	}
-	postgresDb.Exec(createStatement)
-	postgresDb.Close()
+	systemDb.Exec(createStatement)
+	systemDb.Close()
 	db, err := gorm.Open(string(dialect), *dbConnStr)
 	if err != nil {
 		return nil
