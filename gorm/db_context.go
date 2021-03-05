@@ -15,6 +15,7 @@ const (
 )
 
 const postrgresConnStrTemplate = "host={0} port={1} user={2} dbname={3} password={4} sslmode={5}"
+const mssqlConnStrTemplate = "sqlserver://{username}:{password}@{host}:{port}?database={dbname}"
 
 func OpenDb(dialect SqlDialect, host string, port string, dbName string, dbUser string, password string,
 	        useSsl string, create bool) *gorm.DB {
@@ -50,7 +51,8 @@ func createConnStr(dialect SqlDialect, host string, port int, dbName string,
 	if dialect == Postgres {
         connStr = stringFormatter.Format(postrgresConnStrTemplate, host, port, dbUser, dbName, password, useSsl)
 	} else if dialect == Mssql {
-
+        connStr = stringFormatter.FormatComplex(mssqlConnStrTemplate, map[string]interface{}{
+        	"username":dbUser, "password":password, "host":host, "port":1433, "dbname":dbName})
 	} else if dialect == Mysql {
 
 	} else if dialect == Sqlite {
