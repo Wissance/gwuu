@@ -67,12 +67,24 @@ func CloseDb(db *gorm.DB) {
 	}
 }
 
-func DropDb(dialect SqlDialect, connStr string) {
-
+func DropDb(dialect SqlDialect, connStr string) bool {
+	systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
+	return DropDb2(dialect, systemDbConnStr, dbName)
 }
 
-func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) {
-
+func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
+	db, err := gorm.Open(string(dialect), systemDbConnStr)
+	if err != nil {
+		return false
+	}
+	dropDbStatement := stringFormatter.Format("DROP DATABASE IF EXISTS {0}", dbName)
+	err = db.Exec(dropDbStatement).Error
+	if err != nil {
+		CloseDb(db)
+		return false
+	}
+	CloseDb(db)
+    return true
 }
 
 /*
