@@ -19,12 +19,14 @@ const mssqlConnStrTemplate = "sqlserver://{username}:{password}@{host}:{port}?da
 // todo: umv: think about charset as parameter
 const mysqlConnStrTemplate = "{username}:{password}@tcp({host}:{port})/{dbname}?charset=utf8mb4&parseTime=True&loc=Local"
 
-func OpenDb(dialect SqlDialect, host string, port string, dbName string, dbUser string, password string,
+func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
 	        useSsl string, create bool) *gorm.DB {
-    return nil
+    connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
+    return OpenDb2(dialect, connStr, create)
 }
 
 func OpenDb2(dialect SqlDialect, connStr string, create bool) *gorm.DB {
+	dbCheckResult := CheckDb()
 	return nil
 }
 
@@ -58,10 +60,7 @@ func createConnStr(dialect SqlDialect, host string, port int, dbName string,
 	} else if dialect == Mysql {
 		connStr = stringFormatter.FormatComplex(mysqlConnStrTemplate, map[string]interface{}{
 			"username":dbUser, "password":password, "host":host, "port":port, "dbname":dbName})
-	} else if dialect == Sqlite {
-
 	}
-
 	return connStr
 }
 
