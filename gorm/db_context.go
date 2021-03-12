@@ -81,9 +81,24 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) string {
 		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1)
 
 	} else if dialect == Mssql {
+        const mssqlDbPattern = "?database="
+		beginIndex := strings.Index(connStrCopy, mssqlDbPattern)
+		if beginIndex < 0 {
+			return ""
+		}
+		dbNameStr := connStrCopy[beginIndex:]
+		systemDbStr := mssqlDbPattern + mssqlSystemDb
+		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1)
 
 	} else if dialect == Mysql {
-
+        beginIndex := getSymbolIndex(&connStrCopy, '/', 0)
+        if beginIndex < 0 {
+        	return ""
+		}
+		endIndex := getSymbolIndex(&connStrCopy, '?', beginIndex)
+		dbNameStr := connStrCopy[beginIndex: endIndex]
+		systemDbStr := "/" + mysqlSystemDb + "?"
+		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1)
 	}
 	return ""
 }
