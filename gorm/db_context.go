@@ -23,8 +23,8 @@ const postgresSystemDb = "postgres"
 const mssqlSystemDb = "master"
 const mysqlSystemDb = "mysql"
 
-func BuildConnectionString() string {
-	return ""
+func BuildConnectionString(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string, useSsl string) string {
+	return createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
 }
 
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
@@ -67,7 +67,11 @@ func CloseDb(db *gorm.DB) {
 	}
 }
 
-func DropDb(dialect SqlDialect, connStr *string) {
+func DropDb(dialect SqlDialect, connStr string) {
+
+}
+
+func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) {
 
 }
 
