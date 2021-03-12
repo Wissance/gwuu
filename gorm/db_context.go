@@ -23,6 +23,9 @@ const postgresSystemDb = "postgres"
 const mssqlSystemDb = "master"
 const mysqlSystemDb = "mysql"
 
+func BuildConnectionString() string {
+	return ""
+}
 
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
 	        useSsl string, create bool) *gorm.DB {
@@ -37,9 +40,16 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool) *gorm.DB {
 			return nil
 		}
 	} else {
-
+		if !dbCheckResult {
+			systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
+			return createDb(dialect, &systemDbConnStr, &connStr, &dbName)
+		}
 	}
-	return nil
+	db, err := gorm.Open(string(dialect), connStr)
+	if err != nil{
+		return nil
+	}
+	return db
 }
 
 func CheckDb(dialect SqlDialect, dbConnStr string) bool {
@@ -57,7 +67,7 @@ func CloseDb(db *gorm.DB) {
 	}
 }
 
-func DropDb(systemDbConnStr string, dbName string, checkExists bool) {
+func DropDb(dialect SqlDialect, connStr *string) {
 
 }
 
@@ -65,42 +75,43 @@ func DropDb(systemDbConnStr string, dbName string, checkExists bool) {
  * Create system db conn string using connection string to open target database, but database could not exists
  * therefore in some cases we have to create it (if we pass create=true to any OpenDb function).
  * In this function we are processing target db connStr and replace database name with system database name
+ * Return tuple of systemDbConnStr, dbName
  */
-func createSystemDbConnStr(dialect SqlDialect, connStr *string) string {
+func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string) {
 	connStrCopy := *connStr
 	if dialect == Postgres {
         // replace dbname={
 		const postgresDbPattern = "dbname="
 		beginIndex := strings.Index(connStrCopy, postgresDbPattern)
 		if beginIndex < 0 {
-			return ""
+			return "", ""
 		}
 		endIndex := getSymbolIndex(&connStrCopy, ' ', beginIndex +  len(postgresDbPattern))
 		dbNameStr := connStrCopy[beginIndex: endIndex]
 		systemDbStr := postgresDbPattern + postgresSystemDb
-		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1)
+		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr
 
 	} else if dialect == Mssql {
         const mssqlDbPattern = "?database="
 		beginIndex := strings.Index(connStrCopy, mssqlDbPattern)
 		if beginIndex < 0 {
-			return ""
+			return "", ""
 		}
 		dbNameStr := connStrCopy[beginIndex:]
 		systemDbStr := mssqlDbPattern + mssqlSystemDb
-		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1)
+		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr
 
 	} else if dialect == Mysql {
         beginIndex := getSymbolIndex(&connStrCopy, '/', 0)
         if beginIndex < 0 {
-        	return ""
+        	return "", ""
 		}
 		endIndex := getSymbolIndex(&connStrCopy, '?', beginIndex)
 		dbNameStr := connStrCopy[beginIndex: endIndex]
 		systemDbStr := "/" + mysqlSystemDb + "?"
-		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1)
+		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr
 	}
-	return ""
+	return "", ""
 }
 
 func createConnStr(dialect SqlDialect, host string, port int, dbName string,
