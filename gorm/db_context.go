@@ -166,7 +166,7 @@ func getSymbolIndex(str *string, symbol rune, startIndex int) int {
 	strSymbols := []rune(*str)
 	for i := startIndex; i < len(*str); i++ {
 		if strSymbols[i] == symbol {
-            return i;
+            return i
 		}
 	}
 	return  -1
