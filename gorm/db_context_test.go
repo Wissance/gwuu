@@ -5,6 +5,9 @@ import (
 	"testing"
 )
 
+const dbUser = "developer"
+const dbPassword = "123"
+
 // ########################################### public functions tests #################################################
 
 // test Build connection string
@@ -33,7 +36,9 @@ func TestBuildMssqlConnectionString(t *testing.T) {
 // test open db (system db without create)
 
 func TestPostgresOpenSystemDb(t *testing.T) {
-
+    db := OpenDb(Postgres, "127.0.0.1", 5432, "postgres", dbUser, dbPassword, "disable", false)
+    assert.NotNil(t, db)
+    CloseDb(db)
 }
 
 func TestMysqlOpenSystemDb(t *testing.T) {

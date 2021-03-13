@@ -10,7 +10,7 @@ const defaultPageSize = 25
 /*
  * Function for getting data portion (page) by means of GORM
  */
-func Paginate(page, size int) func(db *gorm.DB) *gorm.DB {
+func Paginate(page int, size int) func(db *gorm.DB) *gorm.DB {
 	return func (db *gorm.DB) *gorm.DB {
 		if size > 100 || size < 0 {
 			size = defaultPageSize
