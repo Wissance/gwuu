@@ -124,8 +124,8 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
 		}
 		endIndex := getSymbolIndex(&connStrCopy, '?', beginIndex)
 		dbNameStr := connStrCopy[beginIndex: endIndex]
-		systemDbStr := "/" + mysqlSystemDb + "?"
-		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr[1: len(dbNameStr) - 1]
+		systemDbStr := "/" + mysqlSystemDb
+		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr[1:]
 	}
 	return "", ""
 }

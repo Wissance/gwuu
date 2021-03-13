@@ -77,4 +77,34 @@ func TestCreatePostgresSystemDbConnectionString(t *testing.T) {
 	assert.Equal(t, "mysuperapp", dbName)
 }
 
+func TestCreateMssqlSystemDbConnectionString(t *testing.T) {
+	connStr := "sqlserver://sa:123@192.168.10.100:1433?database=custom_app"
+	expectedSystemConnStr := "sqlserver://sa:123@192.168.10.100:1433?database=master"
+	actualSystemConnStr, dbName := createSystemDbConnStr(Mssql, &connStr)
+	assert.Equal(t, expectedSystemConnStr, actualSystemConnStr)
+	assert.Equal(t, "custom_app", dbName)
+
+	// test when db name like hostname
+	connStr = "sqlserver://mysupeapp:123@mysuperapp.com:1433?database=mysuperapp"
+	expectedSystemConnStr = "sqlserver://mysupeapp:123@mysuperapp.com:1433?database=master"
+	actualSystemConnStr, dbName = createSystemDbConnStr(Mssql, &connStr)
+	assert.Equal(t, expectedSystemConnStr, actualSystemConnStr)
+	assert.Equal(t, "mysuperapp", dbName)
+}
+
+func TestCreateMysqlSystemDbConnectionString(t *testing.T) {
+	connStr := "root:P@ssW0rd@tcp(127.0.0.1:3306)/custom_app?charset=utf8mb4&parseTime=True&loc=Local"
+	expectedSystemConnStr := "root:P@ssW0rd@tcp(127.0.0.1:3306)/mysql?charset=utf8mb4&parseTime=True&loc=Local"
+	actualSystemConnStr, dbName := createSystemDbConnStr(Mysql, &connStr)
+	assert.Equal(t, expectedSystemConnStr, actualSystemConnStr)
+	assert.Equal(t, "custom_app", dbName)
+
+	// test when db name like hostname
+	connStr = "mysuperapp:P@ssW0rd@tcp(mysuperapp.com:3306)/mysuperapp?charset=utf8mb4&parseTime=True&loc=Local"
+	expectedSystemConnStr = "mysuperapp:P@ssW0rd@tcp(mysuperapp.com:3306)/mysql?charset=utf8mb4&parseTime=True&loc=Local"
+	actualSystemConnStr, dbName = createSystemDbConnStr(Mysql, &connStr)
+	assert.Equal(t, expectedSystemConnStr, actualSystemConnStr)
+	assert.Equal(t, "mysuperapp", dbName)
+}
+
 // ####################################################################################################################
