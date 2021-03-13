@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// public functions tests
+// ########################################### public functions tests #################################################
 
 // test Build connection string
 
@@ -57,3 +57,17 @@ func TestMysqlOpenDbWithCreate(t *testing.T) {
 func TestMssqlOpenDbWithCreate(t *testing.T) {
 
 }
+
+// ####################################################################################################################
+
+// ########################################### private functions tests ################################################
+
+func TestCreatePostgresSystemDbConnectionString(t *testing.T) {
+    connStr := "host=localhost port=5432 user=root dbname=custom_app password=P@ssW0rd sslmode=disable"
+    expectedSystemConnStr := "host=localhost port=5432 user=root dbname=postgres password=P@ssW0rd sslmode=disable"
+    actualSystemConnStr, dbName := createSystemDbConnStr(Postgres, &connStr)
+    assert.Equal(t, expectedSystemConnStr, actualSystemConnStr)
+    assert.Equal(t, "custom_app", dbName)
+}
+
+// ####################################################################################################################

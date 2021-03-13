@@ -105,7 +105,7 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
 		endIndex := getSymbolIndex(&connStrCopy, ' ', beginIndex +  len(postgresDbPattern))
 		dbNameStr := connStrCopy[beginIndex: endIndex]
 		systemDbStr := postgresDbPattern + postgresSystemDb
-		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr
+		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr[7:]
 
 	} else if dialect == Mssql {
         const mssqlDbPattern = "?database="
@@ -115,7 +115,7 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
 		}
 		dbNameStr := connStrCopy[beginIndex:]
 		systemDbStr := mssqlDbPattern + mssqlSystemDb
-		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr
+		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr[10:]
 
 	} else if dialect == Mysql {
         beginIndex := getSymbolIndex(&connStrCopy, '/', 0)
@@ -125,7 +125,7 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
 		endIndex := getSymbolIndex(&connStrCopy, '?', beginIndex)
 		dbNameStr := connStrCopy[beginIndex: endIndex]
 		systemDbStr := "/" + mysqlSystemDb + "?"
-		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr
+		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr[1: len(dbNameStr) - 1]
 	}
 	return "", ""
 }
