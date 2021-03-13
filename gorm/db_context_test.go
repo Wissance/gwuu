@@ -68,6 +68,13 @@ func TestCreatePostgresSystemDbConnectionString(t *testing.T) {
     actualSystemConnStr, dbName := createSystemDbConnStr(Postgres, &connStr)
     assert.Equal(t, expectedSystemConnStr, actualSystemConnStr)
     assert.Equal(t, "custom_app", dbName)
+
+    // test when db name like hostname
+	connStr = "host=mysuperapp.com port=5432 user=mysuperapp dbname=mysuperapp password=123456 sslmode=disable"
+	expectedSystemConnStr = "host=mysuperapp.com port=5432 user=mysuperapp dbname=postgres password=123456 sslmode=disable"
+	actualSystemConnStr, dbName = createSystemDbConnStr(Postgres, &connStr)
+	assert.Equal(t, expectedSystemConnStr, actualSystemConnStr)
+	assert.Equal(t, "mysuperapp", dbName)
 }
 
 // ####################################################################################################################
