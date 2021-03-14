@@ -46,7 +46,9 @@ func TestMysqlOpenSystemDb(t *testing.T) {
 }
 
 func TestMssqlOpenSystemDb(t *testing.T) {
-
+	db := OpenDb(Mssql, "localhost", 1433, "master", dbUser, dbPassword, "", false)
+	assert.NotNil(t, db)
+	CloseDb(db)
 }
 
 // test open db with create
