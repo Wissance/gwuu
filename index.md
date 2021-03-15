@@ -1,37 +1,18 @@
-## Welcome to GitHub Pages
+This is a sel of ultimate utils when using GO language to develop web applications.
 
-You can use the [editor on GitHub](https://github.com/Wissance/gwuu/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+Contains following tools:
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+* gorm - set of functions to extend gorm features:
+    - build connection string (Postgres, Mssql, Mysql)
+    - create database (Postgres, Mssql, Mysql)
+    - drop database (Postgres, Mssql, Mysql)
+    - get next identifier (sometimes GORM is unable to create entities with auto-generated identifiers therefore i have to gen it manually)
+    - get portion of data
 
-### Markdown
+To see how to work with Create and Drop DB please see following test:
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+https://github.com/Wissance/gwuu/blob/master/gorm/db_context_test.go
 
-```markdown
-Syntax highlighted code block
+But not all features were covered with tests, Pagaination and Get next id were experimentally tested in projects (but in near future these function will be also covered with tests). See additional functions here:
 
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Wissance/gwuu/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+https://github.com/Wissance/gwuu/blob/master/gorm/db_utils.go
