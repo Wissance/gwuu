@@ -6,7 +6,6 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/wissance/stringFormatter"
-	_ "gorm.io/driver/sqlserver"
 	"strings"
 )
 
