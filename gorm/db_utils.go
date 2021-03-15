@@ -6,13 +6,14 @@ import (
 )
 
 const defaultPageSize = 25
+//const maximumPageSize = 100
 
 /*
  * Function for getting data portion (page) by means of GORM
  */
 func Paginate(page int, size int) func(db *gorm.DB) *gorm.DB {
 	return func (db *gorm.DB) *gorm.DB {
-		if size > 100 || size < 0 {
+		if size < 0 {
 			size = defaultPageSize
 		}
 		if page < 1 {

@@ -19,7 +19,7 @@ const (
     Sqlite = "sqlite"
 )
 
-const postrgresConnStrTemplate = "host={0} port={1} user={2} dbname={3} password={4} sslmode={5}"
+const postgresConnStrTemplate = "host={0} port={1} user={2} dbname={3} password={4} sslmode={5}"
 const mssqlConnStrTemplate = "sqlserver://{username}:{password}@{host}:{port}?database={dbname}"
 // todo: umv: think about charset as parameter
 const mysqlConnStrTemplate = "{username}:{password}@tcp({host}:{port})/{dbname}?charset=utf8mb4&parseTime=True&loc=Local"
@@ -33,8 +33,9 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
 
 /*
  * If you are using MSSQL Do not forget to switch on TCP connections for sql server, otherwise you wil get following error:
- * Unable to open tcp connection with host '127.0.0.1:1433':
- * dial tcp 127.0.0.1:1433: connectex: No connection could be made because the target machine actively refused it.
+ * Unable to open tcp connection with host '127.0.0.1:1433': dial tcp 127.0.0.1:1433: connectex: No connection could
+ * be made because the target machine actively refused it.
+ * Ensure that
  */
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
 	        useSsl string, create bool) *gorm.DB {
@@ -143,7 +144,7 @@ func createConnStr(dialect SqlDialect, host string, port int, dbName string,
 	              dbUser string, password string, useSsl string) string {
 	connStr := ""
 	if dialect == Postgres {
-        connStr = stringFormatter.Format(postrgresConnStrTemplate, host, port, dbUser, dbName, password, useSsl)
+        connStr = stringFormatter.Format(postgresConnStrTemplate, host, port, dbUser, dbName, password, useSsl)
 	} else if dialect == Mssql {
         connStr = stringFormatter.FormatComplex(mssqlConnStrTemplate, map[string]interface{}{
         	"username":dbUser, "password":password, "host":host, "port":port, "dbname":dbName})

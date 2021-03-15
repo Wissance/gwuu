@@ -42,7 +42,9 @@ func TestPostgresOpenSystemDb(t *testing.T) {
 }
 
 func TestMysqlOpenSystemDb(t *testing.T) {
-
+	db := OpenDb(Mysql, "localhost", 3306, "mysql", dbUser, dbPassword, "", false)
+	assert.NotNil(t, db)
+	CloseDb(db)
 }
 
 func TestMssqlOpenSystemDb(t *testing.T) {
@@ -52,17 +54,20 @@ func TestMssqlOpenSystemDb(t *testing.T) {
 }
 
 // test open db with create
-
 func TestPostgresOpenDbWithCreate(t *testing.T) {
-
+    // Create Db when open
+	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_examples", dbUser, dbPassword, "disable")
+	testOpenDbWithCreateAndCheck(t, connStr, Postgres)
 }
 
 func TestMysqlOpenDbWithCreate(t *testing.T) {
-
+	connStr := BuildConnectionString(Mysql, "127.0.0.1", 3306, "gwuu_examples", dbUser, dbPassword, "")
+	testOpenDbWithCreateAndCheck(t, connStr, Mysql)
 }
 
 func TestMssqlOpenDbWithCreate(t *testing.T) {
-
+	connStr := BuildConnectionString(Mssql, "localhost", 1433, "GwuuExamples", dbUser, dbPassword, "")
+	testOpenDbWithCreateAndCheck(t, connStr, Mssql)
 }
 
 // ####################################################################################################################
@@ -115,3 +120,16 @@ func TestCreateMysqlSystemDbConnectionString(t *testing.T) {
 }
 
 // ####################################################################################################################
+
+// ################################################# internal functions ###############################################
+func testOpenDbWithCreateAndCheck(t *testing.T, connStr string, dialect SqlDialect) {
+	db := OpenDb2(dialect, connStr, true)
+	assert.NotNil(t, db)
+	// Close
+	CloseDb(db)
+	// Drop
+	DropDb(dialect, connStr)
+	// Check
+	checkResult := CheckDb(dialect, connStr)
+	assert.Equal(t, false, checkResult)
+}
