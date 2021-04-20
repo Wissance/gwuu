@@ -34,10 +34,18 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
  * If you are using MSSQL Do not forget to switch on TCP connections for sql server, otherwise you wil get following error:
  * Unable to open tcp connection with host '127.0.0.1:1433': dial tcp 127.0.0.1:1433: connectex: No connection could
  * be made because the target machine actively refused it.
- * Ensure that
+ * Ensure that You allowed port usage
+ * Parameters:
+ *    - dialect - string that represent using db driver inside gorm (see enum above)
+ *    - host - ip address / hostname of machine where database server is located
+ *    - port - integer value representing server tcp port (typically 5432 for postgres, 3306 for mysql and 1433 for mssql)
+ *    - dbName - database/catalog/schema name
+ *    - dbUser - user that is using for perform operations on dbName
+ *    - password - dbUser password
+ *    - options
  */
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
-	        useSsl string, create bool) *gorm.DB {
+	        useSsl string, create bool, options interface{}) *gorm.DB {
     connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
     return OpenDb2(dialect, connStr, create)
 }
