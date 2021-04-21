@@ -1,7 +1,6 @@
 package gorm
 
 import (
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mssql"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -67,10 +66,7 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, options *g.Config)
 			return createDb(dialect, &systemDbConnStr, &connStr, &dbName, options)
 		}
 	}
-	/*db, err := gorm.Open(string(dialect), connStr)
-	if err != nil{
-	    return nil
-	}*/
+
 	db, err := g.Open(createDialector(dialect, connStr), options)
 	if err != nil{
 		return nil
@@ -80,9 +76,12 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, options *g.Config)
 }
 
 func CheckDb(dialect SqlDialect, dbConnStr string) bool {
-	db, err := gorm.Open(string(dialect), dbConnStr)
+	db, err := g.Open(createDialector(dialect, dbConnStr), nil)
 	if err == nil {
-		db.Close()
+		sqlDb, err := db.DB()
+		if err == nil && sqlDb != nil {
+			err = sqlDb.Close()
+		}
 		return true
 	}
 	return false
@@ -91,9 +90,9 @@ func CheckDb(dialect SqlDialect, dbConnStr string) bool {
 func CloseDb(db *g.DB) bool {
 	if db != nil {
 		sqlDB, err := db.DB()
-		if err != nil {
+		if err == nil && sqlDB != nil {
 			err = sqlDB.Close()
-			if err != nil {
+			if err == nil {
 				return true
 			}
 		}
@@ -107,17 +106,17 @@ func DropDb(dialect SqlDialect, connStr string) bool {
 }
 
 func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
-	db, err := gorm.Open(string(dialect), systemDbConnStr)
+	db, err := g.Open(createDialector(dialect, systemDbConnStr), nil)
 	if err != nil {
 		return false
 	}
 	dropDbStatement := stringFormatter.Format("DROP DATABASE IF EXISTS {0}", dbName)
 	err = db.Exec(dropDbStatement).Error
 	if err != nil {
-		//CloseDb(db)
+		CloseDb(db)
 		return false
 	}
-	//CloseDb(db)
+	CloseDb(db)
     return true
 }
 
@@ -183,12 +182,15 @@ func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, db
 	createStatementTemplate := "CREATE DATABASE {0}"
 	createStatement := stringFormatter.Format(createStatementTemplate, *dbName)
 
-	systemDb, err := gorm.Open(string(dialect), *systemDbConnStr)
+	systemDb, err := g.Open(createDialector(dialect, *systemDbConnStr), nil)
 	if err != nil {
 		return nil
 	}
 	systemDb.Exec(createStatement)
-	systemDb.Close()
+	sqlDb, err := systemDb.DB()
+	if err == nil {
+		sqlDb.Close()
+	}
 	db, err := g.Open(createDialector(dialect, *dbConnStr), options)
 	if err != nil {
 		return nil
