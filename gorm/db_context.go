@@ -6,6 +6,11 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/wissance/stringFormatter"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/driver/sqlserver"
+	g "gorm.io/gorm"
 	"strings"
 )
 
@@ -42,15 +47,15 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
  *    - dbName - database/catalog/schema name
  *    - dbUser - user that is using for perform operations on dbName
  *    - password - dbUser password
- *    - options
+ *    - options - gorm config (from gorm.io/gorm)
  */
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
-	        useSsl string, create bool, options interface{}) *gorm.DB {
+	        useSsl string, create bool, options *g.Config) *g.DB {
     connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
-    return OpenDb2(dialect, connStr, create)
+    return OpenDb2(dialect, connStr, create, options)
 }
 
-func OpenDb2(dialect SqlDialect, connStr string, create bool) *gorm.DB {
+func OpenDb2(dialect SqlDialect, connStr string, create bool, options *g.Config) *g.DB {
 	dbCheckResult := CheckDb(dialect, connStr)
 	if create == false {
 		if dbCheckResult == false {
@@ -59,13 +64,18 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool) *gorm.DB {
 	} else {
 		if !dbCheckResult {
 			systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
-			return createDb(dialect, &systemDbConnStr, &connStr, &dbName)
+			return createDb(dialect, &systemDbConnStr, &connStr, &dbName, options)
 		}
 	}
-	db, err := gorm.Open(string(dialect), connStr)
+	/*db, err := gorm.Open(string(dialect), connStr)
+	if err != nil{
+	    return nil
+	}*/
+	db, err := g.Open(createDialector(dialect, connStr), options)
 	if err != nil{
 		return nil
 	}
+
 	return db
 }
 
@@ -78,10 +88,17 @@ func CheckDb(dialect SqlDialect, dbConnStr string) bool {
 	return false
 }
 
-func CloseDb(db *gorm.DB) {
+func CloseDb(db *g.DB) bool {
 	if db != nil {
-		defer db.Close()
+		sqlDB, err := db.DB()
+		if err != nil {
+			err = sqlDB.Close()
+			if err != nil {
+				return true
+			}
+		}
 	}
+	return false
 }
 
 func DropDb(dialect SqlDialect, connStr string) bool {
@@ -97,10 +114,10 @@ func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
 	dropDbStatement := stringFormatter.Format("DROP DATABASE IF EXISTS {0}", dbName)
 	err = db.Exec(dropDbStatement).Error
 	if err != nil {
-		CloseDb(db)
+		//CloseDb(db)
 		return false
 	}
-	CloseDb(db)
+	//CloseDb(db)
     return true
 }
 
@@ -162,7 +179,7 @@ func createConnStr(dialect SqlDialect, host string, port int, dbName string,
 	return connStr
 }
 
-func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string) *gorm.DB {
+func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string, options *g.Config) *g.DB {
 	createStatementTemplate := "CREATE DATABASE {0}"
 	createStatement := stringFormatter.Format(createStatementTemplate, *dbName)
 
@@ -172,7 +189,7 @@ func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, db
 	}
 	systemDb.Exec(createStatement)
 	systemDb.Close()
-	db, err := gorm.Open(string(dialect), *dbConnStr)
+	db, err := g.Open(createDialector(dialect, *dbConnStr), options)
 	if err != nil {
 		return nil
 	}
@@ -187,4 +204,17 @@ func getSymbolIndex(str *string, symbol rune, startIndex int) int {
 		}
 	}
 	return  -1
+}
+
+func createDialector(dialect SqlDialect, dbConnStr string) g.Dialector {
+	if dialect == Mysql {
+		return mysql.Open(dbConnStr)
+	}
+	if dialect == Mssql {
+        return sqlserver.Open(dbConnStr)
+	}
+	if dialect == Postgres {
+		return postgres.Open(dbConnStr)
+	}
+    return sqlite.Open(dbConnStr)
 }

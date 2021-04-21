@@ -2,6 +2,9 @@ package gorm
 
 import (
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
+
+	//"gorm.io/gorm"
 	"testing"
 )
 
@@ -36,19 +39,22 @@ func TestBuildMssqlConnectionString(t *testing.T) {
 // test open db (system db without create)
 
 func TestPostgresOpenSystemDb(t *testing.T) {
-    db := OpenDb(Postgres, "127.0.0.1", 5432, "postgres", dbUser, dbPassword, "disable", false)
+	cfg := gorm.Config{}
+    db := OpenDb(Postgres, "127.0.0.1", 5432, "postgres", dbUser, dbPassword, "disable", false, &cfg)
     assert.NotNil(t, db)
     CloseDb(db)
 }
 
 func TestMysqlOpenSystemDb(t *testing.T) {
-	db := OpenDb(Mysql, "localhost", 3306, "mysql", dbUser, dbPassword, "", false)
+	cfg := gorm.Config{}
+	db := OpenDb(Mysql, "localhost", 3306, "mysql", dbUser, dbPassword, "", false, &cfg)
 	assert.NotNil(t, db)
 	CloseDb(db)
 }
 
 func TestMssqlOpenSystemDb(t *testing.T) {
-	db := OpenDb(Mssql, "localhost", 1433, "master", dbUser, dbPassword, "", false)
+	cfg := gorm.Config{}
+	db := OpenDb(Mssql, "localhost", 1433, "master", dbUser, dbPassword, "", false, &cfg)
 	assert.NotNil(t, db)
 	CloseDb(db)
 }
@@ -56,18 +62,21 @@ func TestMssqlOpenSystemDb(t *testing.T) {
 // test open db with create
 func TestPostgresOpenDbWithCreate(t *testing.T) {
     // Create Db when open
+	cfg := gorm.Config{}
 	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_examples", dbUser, dbPassword, "disable")
-	testOpenDbWithCreateAndCheck(t, connStr, Postgres)
+	testOpenDbWithCreateAndCheck(t, connStr, Postgres, &cfg)
 }
 
 func TestMysqlOpenDbWithCreate(t *testing.T) {
+	cfg := gorm.Config{}
 	connStr := BuildConnectionString(Mysql, "127.0.0.1", 3306, "gwuu_examples", dbUser, dbPassword, "")
-	testOpenDbWithCreateAndCheck(t, connStr, Mysql)
+	testOpenDbWithCreateAndCheck(t, connStr, Mysql, &cfg)
 }
 
 func TestMssqlOpenDbWithCreate(t *testing.T) {
+	cfg := gorm.Config{}
 	connStr := BuildConnectionString(Mssql, "localhost", 1433, "GwuuExamples", dbUser, dbPassword, "")
-	testOpenDbWithCreateAndCheck(t, connStr, Mssql)
+	testOpenDbWithCreateAndCheck(t, connStr, Mssql, &cfg)
 }
 
 // ####################################################################################################################
@@ -122,8 +131,8 @@ func TestCreateMysqlSystemDbConnectionString(t *testing.T) {
 // ####################################################################################################################
 
 // ################################################# internal functions ###############################################
-func testOpenDbWithCreateAndCheck(t *testing.T, connStr string, dialect SqlDialect) {
-	db := OpenDb2(dialect, connStr, true)
+func testOpenDbWithCreateAndCheck(t *testing.T, connStr string, dialect SqlDialect, options *gorm.Config) {
+	db := OpenDb2(dialect, connStr, true, options)
 	assert.NotNil(t, db)
 	// Close
 	CloseDb(db)
