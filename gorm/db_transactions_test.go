@@ -27,10 +27,10 @@ type User struct {
 	Roles []Role `gorm:"many2many:user_roles;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` //
 }
 
-type userRole struct {
+/*type userRole struct {
 	UserID  int `gorm:"primaryKey"`
 	RoleID int `gorm:"primaryKey"`
-}
+}*/
 
 func TestModelWithMultipleNestedTransactions(t *testing.T) {
 	cfg := g.Config{SkipDefaultTransaction: true}
@@ -76,6 +76,43 @@ func TestModelWithMultipleNestedTransactions(t *testing.T) {
 	db.Model(Role{}).Where("name = ?", "administrator").First(&role)
 	assert.True(t, role.ID > 0)
     // Close
+	CloseDb(db)
+	// Drop
+	DropDb(Postgres, connStr)
+}
+
+func TestModelWithMultipleManualTransactions(t *testing.T) {
+	cfg := g.Config{SkipDefaultTransaction: true}
+	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
+	db := OpenDb2(Postgres, connStr, true, &cfg)
+	assert.NotNil(t, db)
+
+	prepareDatabase(db)
+	sessionConfig := g.Session{SkipDefaultTransaction: true}
+	tx := db.Session(&sessionConfig)
+	tx.Begin()
+	role1 := Role{Name: "regular"}
+	tx.Create(&role1)
+	role2 := Role{Name: "administrator"}
+	tx.Create(&role2)
+	tx.Commit()
+	var role Role
+	db.Model(Role{}).Where("name = ?", role1.Name).First(&role)
+	assert.True(t, role.ID > 0)
+	db.Model(Role{}).Where("name = ?", role2.Name).First(&role)
+	assert.True(t, role.ID > 0)
+	tx.Begin()
+	userProfile := Profile{Name: "user"}
+	db.Create(&userProfile)
+	adminProfile := Profile{Name: "admin"}
+	db.Create(&adminProfile)
+	tx.Commit()
+	var profile Profile
+	db.Model(Profile{}).Where("name = ?", userProfile.Name).First(&profile)
+	assert.True(t, role.ID > 0)
+	db.Model(Profile{}).Where("name = ?", adminProfile.Name).First(&profile)
+	assert.True(t, role.ID > 0)
+	// Close
 	CloseDb(db)
 	// Drop
 	DropDb(Postgres, connStr)
