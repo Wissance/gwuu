@@ -38,19 +38,35 @@ func TestModelWithMultipleTransactions(t *testing.T) {
 	assert.NotNil(t, db)
 
 	prepareDatabase(db)
-    db = db.Begin()
-	// transaction 1, commit
-	userProfile := Profile{Name: "user"}
-	db.Create(&userProfile)
+	var regularUser User
+	db.Transaction(func(tx *g.DB) error {
+		// transaction 1, commit
+		userProfile := Profile{Name: "user"}
+		db.Create(&userProfile)
 
-	adminProfile := Profile{Name: "admin"}
-	db.Create(&adminProfile)
+		adminProfile := Profile{Name: "admin"}
+		db.Create(&adminProfile)
 
-	regularUser := User{UserName: "def", PasswordHash: "==-b56745560", Profile: userProfile}
-	db.Create(&regularUser)
-	db = db.Commit()
+		regularUser = User{UserName: "def", PasswordHash: "==-b56745560", Profile: userProfile}
+		db.Create(&regularUser)
+		return nil
+	})
+	var user User
+    db.Model(User{}).Where("user_name = ?", regularUser.UserName).First(&user)
+    assert.True(t, user.ID > 0)
 	// transaction 2, commit
-
+	db.Transaction(func(tx *g.DB) error {
+		role1 := Role{Name: "regular"}
+		db.Create(&role1)
+		role2 := Role{Name: "administrator"}
+		db.Create(&role2)
+		return nil
+	})
+	var role Role
+	db.Model(Role{}).Where("name = ?", "regular").First(&role)
+	assert.True(t, role.ID > 0)
+	db.Model(Role{}).Where("name = ?", "administrator").First(&role)
+	assert.True(t, role.ID > 0)
 	// transaction 3, rollback
 
 	// transaction 4 commit
