@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"errors"
 	gg "github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
 	g "gorm.io/gorm"
@@ -31,7 +32,7 @@ type userRole struct {
 	RoleID int `gorm:"primaryKey"`
 }
 
-func TestModelWithMultipleTransactions(t *testing.T) {
+func TestModelWithMultipleNestedTransactions(t *testing.T) {
 	cfg := g.Config{SkipDefaultTransaction: true}
 	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
 	db := OpenDb2(Postgres, connStr, true, &cfg)
@@ -68,9 +69,12 @@ func TestModelWithMultipleTransactions(t *testing.T) {
 	db.Model(Role{}).Where("name = ?", "administrator").First(&role)
 	assert.True(t, role.ID > 0)
 	// transaction 3, rollback
-
-	// transaction 4 commit
-
+	db.Transaction(func(tx *g.DB) error {
+		db.Delete(&role)
+		return errors.New("just testing rollback")
+	})
+	db.Model(Role{}).Where("name = ?", "administrator").First(&role)
+	assert.True(t, role.ID > 0)
     // Close
 	CloseDb(db)
 	// Drop
