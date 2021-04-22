@@ -95,7 +95,7 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, options *g.Config)
 	return db
 }
 
-/*
+/* Functions that checks if database exists or not
  *
  */
 func CheckDb(dialect SqlDialect, dbConnStr string) bool {
@@ -110,7 +110,7 @@ func CheckDb(dialect SqlDialect, dbConnStr string) bool {
 	return false
 }
 
-/*
+/* Function that close connection to database
  *
  */
 func CloseDb(db *g.DB) bool {
@@ -126,7 +126,7 @@ func CloseDb(db *g.DB) bool {
 	return false
 }
 
-/*
+/* Function that drop database from server
  *
  */
 func DropDb(dialect SqlDialect, connStr string) bool {
@@ -134,7 +134,7 @@ func DropDb(dialect SqlDialect, connStr string) bool {
 	return DropDb2(dialect, systemDbConnStr, dbName)
 }
 
-/*
+/* Function that drop database from server
  *
  */
 func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
@@ -152,7 +152,7 @@ func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
     return true
 }
 
-/*
+/* Function that creates system database connection string from database connection string
  * Create system db conn string using connection string to open target database, but database could not exists
  * therefore in some cases we have to create it (if we pass create=true to any OpenDb function).
  * In this function we are processing target db connStr and replace database name with system database name
@@ -195,7 +195,7 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
 	return "", ""
 }
 
-/*
+/* Function that creates connection string from individual parameters
  *
  */
 func createConnStr(dialect SqlDialect, host string, port int, dbName string,
@@ -213,7 +213,7 @@ func createConnStr(dialect SqlDialect, host string, port int, dbName string,
 	return connStr
 }
 
-/*
+/* Function that creates database on server
  *
  */
 func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string, options *g.Config) *g.DB {
@@ -236,7 +236,7 @@ func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, db
 	return db
 }
 
-/*
+/* Function that searches index of symbol in string from start position (index)
  *
  */
 func getSymbolIndex(str *string, symbol rune, startIndex int) int {
@@ -249,7 +249,7 @@ func getSymbolIndex(str *string, symbol rune, startIndex int) int {
 	return  -1
 }
 
-/*
+/* Function that creates dialector
  *
  */
 func createDialector(dialect SqlDialect, dbConnStr string) g.Dialector {
