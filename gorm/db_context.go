@@ -1,11 +1,15 @@
 package gorm
 
 import (
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mssql"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/wissance/stringFormatter"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/driver/sqlserver"
+	g "gorm.io/gorm"
 	"strings"
 )
 
@@ -26,23 +30,51 @@ const postgresSystemDb = "postgres"
 const mssqlSystemDb = "master"
 const mysqlSystemDb = "mysql"
 
+/* Function that builds connection string from individual parameters to use in OpenDb2
+ * Parameters:
+ *    - dialect - string that represent using db driver inside gorm (see enum above)
+ *    - host - ip address / hostname of machine where database server is located
+ *    - port - integer value representing server tcp port (typically 5432 for postgres, 3306 for mysql and 1433 for mssql)
+ *    - dbName - database/catalog/schema name
+ *    - dbUser - user that is using for perform operations on dbName
+ *    - password - dbUser password
+ *    - useSsl - is a string value that currently is using with Postgres Sql Only (allowed options are: disable, and others for enable)
+ */
 func BuildConnectionString(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string, useSsl string) string {
 	return createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
 }
 
-/*
+/* Function that Open or Create and Open database
  * If you are using MSSQL Do not forget to switch on TCP connections for sql server, otherwise you wil get following error:
  * Unable to open tcp connection with host '127.0.0.1:1433': dial tcp 127.0.0.1:1433: connectex: No connection could
  * be made because the target machine actively refused it.
- * Ensure that
+ * Ensure that You allowed port usage by Sql Server Connection Manager
+ * Parameters:
+ *    - dialect - string that represent using db driver inside gorm (see enum above)
+ *    - host - ip address / hostname of machine where database server is located
+ *    - port - integer value representing server tcp port (typically 5432 for postgres, 3306 for mysql and 1433 for mssql)
+ *    - dbName - database/catalog/schema name
+ *    - dbUser - user that is using for perform operations on dbName
+ *    - password - dbUser password
+ *    - create - if true we should create database if it does not exists
+ *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
  */
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
-	        useSsl string, create bool) *gorm.DB {
+	        useSsl string, create bool, options *g.Config) *g.DB {
     connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
-    return OpenDb2(dialect, connStr, create)
+    return OpenDb2(dialect, connStr, create, options)
 }
 
-func OpenDb2(dialect SqlDialect, connStr string, create bool) *gorm.DB {
+/* Function that Open or Create and Open database
+ * This function does same as OpenDb but there is only one difference in parameters: for this function we pass connection string
+ * instead of bunch of individual parameters
+ * Parameters:
+ *    - dialect - string that represent using db driver inside gorm (see enum above)
+ *    - connStr - full connection string
+ *    - create - if true we should create database if it does not exists
+ *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
+ */
+func OpenDb2(dialect SqlDialect, connStr string, create bool, options *g.Config) *g.DB {
 	dbCheckResult := CheckDb(dialect, connStr)
 	if create == false {
 		if dbCheckResult == false {
@@ -51,38 +83,62 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool) *gorm.DB {
 	} else {
 		if !dbCheckResult {
 			systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
-			return createDb(dialect, &systemDbConnStr, &connStr, &dbName)
+			return createDb(dialect, &systemDbConnStr, &connStr, &dbName, options)
 		}
 	}
-	db, err := gorm.Open(string(dialect), connStr)
+
+	db, err := g.Open(createDialector(dialect, connStr), options)
 	if err != nil{
 		return nil
 	}
+
 	return db
 }
 
+/* Functions that checks if database exists or not
+ *
+ */
 func CheckDb(dialect SqlDialect, dbConnStr string) bool {
-	db, err := gorm.Open(string(dialect), dbConnStr)
+	db, err := g.Open(createDialector(dialect, dbConnStr), nil)
 	if err == nil {
-		db.Close()
+		sqlDb, err := db.DB()
+		if err == nil && sqlDb != nil {
+			err = sqlDb.Close()
+		}
 		return true
 	}
 	return false
 }
 
-func CloseDb(db *gorm.DB) {
+/* Function that close connection to database
+ *
+ */
+func CloseDb(db *g.DB) bool {
 	if db != nil {
-		defer db.Close()
+		sqlDB, err := db.DB()
+		if err == nil && sqlDB != nil {
+			err = sqlDB.Close()
+			if err == nil {
+				return true
+			}
+		}
 	}
+	return false
 }
 
+/* Function that drop database from server
+ *
+ */
 func DropDb(dialect SqlDialect, connStr string) bool {
 	systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
 	return DropDb2(dialect, systemDbConnStr, dbName)
 }
 
+/* Function that drop database from server
+ *
+ */
 func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
-	db, err := gorm.Open(string(dialect), systemDbConnStr)
+	db, err := g.Open(createDialector(dialect, systemDbConnStr), nil)
 	if err != nil {
 		return false
 	}
@@ -96,7 +152,7 @@ func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
     return true
 }
 
-/*
+/* Function that creates system database connection string from database connection string
  * Create system db conn string using connection string to open target database, but database could not exists
  * therefore in some cases we have to create it (if we pass create=true to any OpenDb function).
  * In this function we are processing target db connStr and replace database name with system database name
@@ -139,6 +195,9 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
 	return "", ""
 }
 
+/* Function that creates connection string from individual parameters
+ *
+ */
 func createConnStr(dialect SqlDialect, host string, port int, dbName string,
 	              dbUser string, password string, useSsl string) string {
 	connStr := ""
@@ -154,23 +213,32 @@ func createConnStr(dialect SqlDialect, host string, port int, dbName string,
 	return connStr
 }
 
-func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string) *gorm.DB {
+/* Function that creates database on server
+ *
+ */
+func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string, options *g.Config) *g.DB {
 	createStatementTemplate := "CREATE DATABASE {0}"
 	createStatement := stringFormatter.Format(createStatementTemplate, *dbName)
 
-	systemDb, err := gorm.Open(string(dialect), *systemDbConnStr)
+	systemDb, err := g.Open(createDialector(dialect, *systemDbConnStr), nil)
 	if err != nil {
 		return nil
 	}
 	systemDb.Exec(createStatement)
-	systemDb.Close()
-	db, err := gorm.Open(string(dialect), *dbConnStr)
+	sqlDb, err := systemDb.DB()
+	if err == nil {
+		sqlDb.Close()
+	}
+	db, err := g.Open(createDialector(dialect, *dbConnStr), options)
 	if err != nil {
 		return nil
 	}
 	return db
 }
 
+/* Function that searches index of symbol in string from start position (index)
+ *
+ */
 func getSymbolIndex(str *string, symbol rune, startIndex int) int {
 	strSymbols := []rune(*str)
 	for i := startIndex; i < len(*str); i++ {
@@ -179,4 +247,20 @@ func getSymbolIndex(str *string, symbol rune, startIndex int) int {
 		}
 	}
 	return  -1
+}
+
+/* Function that creates dialector
+ *
+ */
+func createDialector(dialect SqlDialect, dbConnStr string) g.Dialector {
+	if dialect == Mysql {
+		return mysql.Open(dbConnStr)
+	}
+	if dialect == Mssql {
+        return sqlserver.Open(dbConnStr)
+	}
+	if dialect == Postgres {
+		return postgres.Open(dbConnStr)
+	}
+    return sqlite.Open(dbConnStr)
 }

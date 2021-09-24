@@ -1,8 +1,8 @@
 package gorm
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/wissance/stringFormatter"
+	"gorm.io/gorm"
 )
 
 const defaultPageSize = 25
