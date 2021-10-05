@@ -7,7 +7,7 @@ import (
 	"github.com/wissance/stringFormatter"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
+	//"gorm.io/driver/sqlite"
 	"gorm.io/driver/sqlserver"
 	g "gorm.io/gorm"
 	"strings"
@@ -262,5 +262,6 @@ func createDialector(dialect SqlDialect, dbConnStr string) g.Dialector {
 	if dialect == Postgres {
 		return postgres.Open(dbConnStr)
 	}
-    return sqlite.Open(dbConnStr)
+    //return sqlite.Open(dbConnStr)
+    return nil
 }
