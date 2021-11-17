@@ -96,7 +96,9 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, options *g.Config)
 }
 
 /* Functions that checks if database exists or not
- *
+ * Parameters:
+ *    - dialect - string that represent using db driver inside gorm (see enum above)
+ *    - connStr - full connection string
  */
 func CheckDb(dialect SqlDialect, dbConnStr string) bool {
 	db, err := g.Open(createDialector(dialect, dbConnStr), nil)
@@ -111,7 +113,8 @@ func CheckDb(dialect SqlDialect, dbConnStr string) bool {
 }
 
 /* Function that close connection to database
- *
+ * Parameters:
+ *    -
  */
 func CloseDb(db *g.DB) bool {
 	if db != nil {
