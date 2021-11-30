@@ -30,6 +30,7 @@ const postgresSystemDb = "postgres"
 const mssqlSystemDb = "master"
 const mysqlSystemDb = "mysql"
 
+// BuildConnectionString
 /* Function that builds connection string from individual parameters to use in OpenDb2
  * Parameters:
  *    - dialect - string that represent using db driver inside gorm (see enum above)
@@ -39,11 +40,13 @@ const mysqlSystemDb = "mysql"
  *    - dbUser - user that is using for perform operations on dbName
  *    - password - dbUser password
  *    - useSsl - is a string value that currently is using with Postgres Sql Only (allowed options are: disable, and others for enable)
+ * Returns database connection string
  */
 func BuildConnectionString(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string, useSsl string) string {
 	return createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
 }
 
+// OpenDb
 /* Function that Open or Create and Open database
  * If you are using MSSQL Do not forget to switch on TCP connections for sql server, otherwise you wil get following error:
  * Unable to open tcp connection with host '127.0.0.1:1433': dial tcp 127.0.0.1:1433: connectex: No connection could
@@ -58,6 +61,7 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
  *    - password - dbUser password
  *    - create - if true we should create database if it does not exists
  *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
+ * Returns gorm.DB address of database context object
  */
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
 	        useSsl string, create bool, options *g.Config) *g.DB {
@@ -65,9 +69,10 @@ func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser str
     return OpenDb2(dialect, connStr, create, options)
 }
 
+// OpenDb2
 /* Function that Open or Create and Open database
  * This function does same as OpenDb but there is only one difference in parameters: for this function we pass connection string
- * instead of bunch of individual parameters
+ * instead of a lot of individual parameters
  * Parameters:
  *    - dialect - string that represent using db driver inside gorm (see enum above)
  *    - connStr - full connection string
@@ -95,10 +100,12 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, options *g.Config)
 	return db
 }
 
+// CheckDb
 /* Functions that checks if database exists or not
  * Parameters:
  *    - dialect - string that represent using db driver inside gorm (see enum above)
  *    - connStr - full connection string
+ * Returns true if database exists otherwise false
  */
 func CheckDb(dialect SqlDialect, dbConnStr string) bool {
 	db, err := g.Open(createDialector(dialect, dbConnStr), nil)
@@ -112,9 +119,11 @@ func CheckDb(dialect SqlDialect, dbConnStr string) bool {
 	return false
 }
 
+// CloseDb
 /* Function that close connection to database
  * Parameters:
- *    -
+ *    - db - address of database context object
+ * Returns true on success
  */
 func CloseDb(db *g.DB) bool {
 	if db != nil {
@@ -129,16 +138,25 @@ func CloseDb(db *g.DB) bool {
 	return false
 }
 
-/* Function that drop database from server
- *
+// DropDb
+/* Function that drops database from server
+ * Parameters:
+ *    - dialect - string that represent using db driver inside gorm (see enum above)
+ *    - connStr - full connection string
  */
 func DropDb(dialect SqlDialect, connStr string) bool {
 	systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
 	return DropDb2(dialect, systemDbConnStr, dbName)
 }
 
-/* Function that drop database from server
- *
+// DropDb2
+/* Function that drop database from server using system database and dropping database name
+ * Parameters:
+ *     - dialect - string that represent using db driver inside gorm (see enum above)
+ *     - systemDbConnStr - connection string to system database (in mysql - mysql, in sqlserver - master,
+ *                         in postgres - postgres)
+ *     - dbName - name of database that should be deleted
+ * Returns true if database was deleted / dropped
  */
 func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
 	db, err := g.Open(createDialector(dialect, systemDbConnStr), nil)
@@ -155,8 +173,9 @@ func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
     return true
 }
 
+// createSystemDbConnStr
 /* Function that creates system database connection string from database connection string
- * Create system db conn string using connection string to open target database, but database could not exists
+ * Create system db conn string using connection string to open target database, but database could not exist
  * therefore in some cases we have to create it (if we pass create=true to any OpenDb function).
  * In this function we are processing target db connStr and replace database name with system database name
  * Return tuple of systemDbConnStr, dbName
@@ -198,6 +217,7 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
 	return "", ""
 }
 
+// createConnStr
 /* Function that creates connection string from individual parameters
  *
  */
@@ -216,6 +236,7 @@ func createConnStr(dialect SqlDialect, host string, port int, dbName string,
 	return connStr
 }
 
+// createDb
 /* Function that creates database on server
  *
  */
@@ -239,6 +260,7 @@ func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, db
 	return db
 }
 
+// getSymbolIndex
 /* Function that searches index of symbol in string from start position (index)
  *
  */
@@ -252,6 +274,7 @@ func getSymbolIndex(str *string, symbol rune, startIndex int) int {
 	return  -1
 }
 
+// createDialector
 /* Function that creates dialector
  *
  */
