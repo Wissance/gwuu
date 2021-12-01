@@ -174,10 +174,13 @@ func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
 }
 
 // createSystemDbConnStr
-/* Function that creates system database connection string from database connection string
+/* Function that creates system database connection string from target database connection string
  * Create system db conn string using connection string to open target database, but database could not exist
  * therefore in some cases we have to create it (if we pass create=true to any OpenDb function).
  * In this function we are processing target db connStr and replace database name with system database name
+ * Parameters:
+ *     - dialect - string that represent using db driver inside gorm (see enum above)
+ *     - connStr - connection string to other database
  * Return tuple of systemDbConnStr, dbName
  */
 func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string) {
@@ -219,7 +222,15 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
 
 // createConnStr
 /* Function that creates connection string from individual parameters
- *
+ * Parameters:
+ *    - dialect - string that represent using db driver inside gorm (see enum above)
+ *    - host - ip address / hostname of machine where database server is located
+ *    - port - integer value representing server tcp port (typically 5432 for postgres, 3306 for mysql and 1433 for mssql)
+ *    - dbName - database/catalog/schema name
+ *    - dbUser - user that is using for perform operations on dbName
+ *    - password - dbUser password
+ *    - useSsl - is a string value that currently is using with Postgres Sql Only (allowed options are: disable, and others for enable)
+ * Returns connection string
  */
 func createConnStr(dialect SqlDialect, host string, port int, dbName string,
 	              dbUser string, password string, useSsl string) string {
@@ -238,7 +249,13 @@ func createConnStr(dialect SqlDialect, host string, port int, dbName string,
 
 // createDb
 /* Function that creates database on server
- *
+ * Parameters:
+ *    - dialect - string that represent using db driver inside gorm (see enum above)
+ *    - systemDbConnStr - system (mysql - mysql, postgres - postgres, sqlserver - master) database connection string
+ *    - dbConnStr - target database connection string
+ *    - dbName - database name
+ *    - options - gorm context configuration
+ * Return pointer to database context
  */
 func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string, options *g.Config) *g.DB {
 	createStatementTemplate := "CREATE DATABASE {0}"
@@ -262,10 +279,17 @@ func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, db
 
 // getSymbolIndex
 /* Function that searches index of symbol in string from start position (index)
- *
+ * Parameters:
+ *    - str - string where we are searching for a symbol
+ *    - symbol - single symbol that we are searching in a string
+ *    - startIndex - index of string from what we
+ * Returns index of symbol in str otherwise -1
  */
 func getSymbolIndex(str *string, symbol rune, startIndex int) int {
 	strSymbols := []rune(*str)
+	if startIndex < 0 {
+		startIndex = 0
+	}
 	for i := startIndex; i < len(*str); i++ {
 		if strSymbols[i] == symbol {
             return i
@@ -275,8 +299,11 @@ func getSymbolIndex(str *string, symbol rune, startIndex int) int {
 }
 
 // createDialector
-/* Function that creates dialector
- *
+/* Function that creates dialector (calls Open of driver)
+ * Parameters:
+ *    - dialect - dialect of database server
+ *    - dbConnStr -
+ * Return dialector or nil
  */
 func createDialector(dialect SqlDialect, dbConnStr string) g.Dialector {
 	if dialect == Mysql {
