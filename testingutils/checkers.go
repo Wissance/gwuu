@@ -6,16 +6,17 @@ import (
 	"testing"
 )
 
-/*
- *  This function allow to check two arrays of Strings with order and without it
+// CheckStrings
+/*  This function allow to compare two arrays of Strings with order and without it
  *  Parameters:
  *     - t is Test State, because we provide functions to check equality in tests
  *     - expected - one array of strings
  *     - actual - another array of strings
  *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
  *  Functions return nothing and asserts if arrays are not equals
+ *  Returns true if there is no assert fail, otherwise - false
  */
-func CheckStrings(t *testing.T, expected []string, actual []string, checkOrder bool) {
+func CheckStrings(t *testing.T, expected []string, actual []string, checkOrder bool) bool {
 	if expected == nil || actual == nil{
 		assert.Nil(t, expected, "Checking that expected is nil")
 		assert.Nil(t, actual, "Checking that actual is nil")
@@ -38,10 +39,11 @@ func CheckStrings(t *testing.T, expected []string, actual []string, checkOrder b
 			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object {0} exists in actual array", eItem))
 		}
 	}
+	return !t.Failed()
 }
 
-/*
- *  This function allow to check two arrays of int's with order and without it
+// CheckIntegers
+/*  This function allow to compare two arrays of int's with order and without it
  *  Parameters:
  *     - t is Test State, because we provide functions to check equality in tests
  *     - expected - one array of int
@@ -74,8 +76,8 @@ func CheckIntegers(t *testing.T, expected []int, actual []int, checkOrder bool) 
 	}
 }
 
-/*
- *  This function allow to check two arrays of int64 with order and without it
+// CheckIntegers64
+/*  This function allow to check two arrays of int64 with order and without it
  *  Parameters:
  *     - t is Test State, because we provide functions to check equality in tests
  *     - expected - one array of int64
@@ -108,6 +110,15 @@ func CheckIntegers64(t *testing.T, expected []int64, actual []int64, checkOrder 
 	}
 }
 
+// CheckUnsignedIntegers
+/*  This function allow to compare two arrays of uint with order and without it
+ *  Parameters:
+ *     - t is Test State, because we provide functions to check equality in tests
+ *     - expected - one array of uint
+ *     - actual - another array of uint
+ *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
+ *  Functions return nothing and asserts if arrays are not equals
+ */
 func CheckUnsignedIntegers(t *testing.T, expected []uint, actual []uint, checkOrder bool) {
 	if expected == nil || actual == nil{
 		assert.Nil(t, expected, "Checking that expected is nil")
@@ -133,6 +144,15 @@ func CheckUnsignedIntegers(t *testing.T, expected []uint, actual []uint, checkOr
 	}
 }
 
+// CheckUnsignedIntegers64
+/*  This function allow to compare two arrays of uint64 with order and without it
+ *  Parameters:
+ *     - t is Test State, because we provide functions to check equality in tests
+ *     - expected - one array of uint64
+ *     - actual - another array of uint64
+ *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
+ *  Functions return nothing and asserts if arrays are not equals
+ */
 func CheckUnsignedIntegers64(t *testing.T, expected []uint64, actual []uint64, checkOrder bool) {
 	if expected == nil || actual == nil{
 		assert.Nil(t, expected, "Checking that expected is nil")
@@ -179,6 +199,13 @@ func CheckComplexes128(t *testing.T, expected []complex64, actual []complex64, p
 
 }*/
 
+// contains
+/* Function check that int item in arr
+ * Parameters:
+ *     - arr - array where item could be located
+ *     - item - what we are searching in arr
+ * Returns true if item in array otherwise false
+ */
 func contains(arr []int, item int) bool {
 	for _, a := range arr {
 		if a == item {

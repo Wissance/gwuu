@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
   <component name="BranchesTreeState">
     <expand>
       <path>
@@ -31,8 +34,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7818d261-8cac-4167-9724-9ed24a23c2d7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gorm/db_context.go" beforeDir="false" afterPath="$PROJECT_DIR$/gorm/db_context.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testingutils/checkers_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testingutils/checkers.go" beforeDir="false" afterPath="$PROJECT_DIR$/testingutils/checkers.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +50,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="C:\Go" />
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -63,19 +67,29 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="go.formatter.settings.were.checked" value="true" />
     <property name="go.import.settings.migrated" value="true" />
+    <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/testingutils" />
   </component>
-  <component name="RunManager" selected="Go Test.go test gwuu/gorm">
+  <component name="RunManager" selected="Go Test.go test testingutils">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="gwuu" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
     <configuration name="TestMssqlOpenSystemDb in db_context_test.go db_context.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="gwuu" />
       <working_directory value="$PROJECT_DIR$/gorm" />
-      <framework value="gotest" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$/gorm" />
       <filePath value="$PROJECT_DIR$/gorm/db_context_test.go|$PROJECT_DIR$/gorm/db_context.go" />
+      <framework value="gotest" />
       <pattern value="^TestMssqlOpenSystemDb$" />
       <method v="2" />
     </configuration>
@@ -92,40 +106,40 @@
     <configuration name="TestMssqlOpenSystemDb in db_context_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="gwuu" />
       <working_directory value="$PROJECT_DIR$/gorm" />
-      <framework value="gotest" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$/gorm" />
       <filePath value="$PROJECT_DIR$/gorm/db_context_test.go" />
+      <framework value="gotest" />
       <pattern value="^TestMssqlOpenSystemDb$" />
       <method v="2" />
     </configuration>
     <configuration name="TestMysqlOpenSystemDb in db_context_test.go db_context.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="gwuu" />
       <working_directory value="$PROJECT_DIR$/gorm" />
-      <framework value="gotest" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$/gorm" />
       <filePath value="$PROJECT_DIR$/gorm/db_context_test.go|$PROJECT_DIR$/gorm/db_context.go" />
+      <framework value="gotest" />
       <pattern value="^TestMysqlOpenSystemDb$" />
       <method v="2" />
     </configuration>
     <configuration name="TestPostgresOpenSystemDb in db_context_test.go db_context.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="gwuu" />
       <working_directory value="$PROJECT_DIR$/gorm" />
-      <framework value="gotest" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$/gorm" />
       <filePath value="$PROJECT_DIR$/gorm/db_context_test.go|$PROJECT_DIR$/gorm/db_context.go" />
+      <framework value="gotest" />
       <pattern value="^TestPostgresOpenSystemDb$" />
       <method v="2" />
     </configuration>
     <configuration name="TestPostgresOpenSystemDb in db_context_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="gwuu" />
       <working_directory value="$PROJECT_DIR$/gorm" />
-      <framework value="gotest" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$/gorm" />
       <filePath value="$PROJECT_DIR$/gorm/db_context_test.go" />
+      <framework value="gotest" />
       <pattern value="^TestPostgresOpenSystemDb$" />
       <method v="2" />
     </configuration>
@@ -133,37 +147,48 @@
       <module name="gwuu" />
       <working_directory value="$PROJECT_DIR$/" />
       <go_parameters value="-i" />
-      <framework value="gotest" />
       <kind value="DIRECTORY" />
       <directory value="$PROJECT_DIR$/gorm" />
+      <framework value="gotest" />
       <method v="2" />
     </configuration>
     <configuration name="go test gorm" type="GoTestRunConfiguration" factoryName="Go Test" nameIsGenerated="true">
       <module name="gwuu" />
       <working_directory value="$PROJECT_DIR$/" />
       <go_parameters value="-i" />
-      <framework value="gotest" />
       <kind value="DIRECTORY" />
       <directory value="$PROJECT_DIR$/gorm" />
+      <framework value="gotest" />
       <method v="2" />
     </configuration>
     <configuration name="go test gwuu/gorm" type="GoTestRunConfiguration" factoryName="Go Test">
       <module name="gwuu" />
       <working_directory value="$PROJECT_DIR$/" />
       <go_parameters value="-i" />
-      <framework value="gotest" />
       <kind value="DIRECTORY" />
       <directory value="$PROJECT_DIR$/gorm" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test testingutils" type="GoTestRunConfiguration" factoryName="Go Test" nameIsGenerated="true">
+      <module name="gwuu" />
+      <working_directory value="$PROJECT_DIR$/testingutils" />
+      <go_parameters value="-i" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$/testingutils" />
+      <output_directory value="$PROJECT_DIR$/testingutils" />
+      <framework value="gotest" />
       <method v="2" />
     </configuration>
     <list>
       <item itemvalue="Go Test.go test gorm" />
       <item itemvalue="Go Test.go test gwuu/gorm" />
-      <item itemvalue="Go Test.TestPostgresOpenSystemDb in db_context_test.go db_context.go" />
+      <item itemvalue="Go Test.go test testingutils" />
       <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go db_context.go" />
-      <item itemvalue="Go Test.TestPostgresOpenSystemDb in db_context_test.go" />
       <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go" />
       <item itemvalue="Go Test.TestMysqlOpenSystemDb in db_context_test.go db_context.go" />
+      <item itemvalue="Go Test.TestPostgresOpenSystemDb in db_context_test.go db_context.go" />
+      <item itemvalue="Go Test.TestPostgresOpenSystemDb in db_context_test.go" />
     </list>
     <recent_temporary>
       <list>
@@ -175,8 +200,9 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="2" />
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -193,78 +219,33 @@
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
   </component>
-  <component name="WindowStateProjectService">
-    <state x="444" y="182" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1615799751797">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="444" y="182" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1615799751797" />
-    <state x="185" y="107" width="1611" height="840" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog" timestamp="1615658613127">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="185" y="107" width="1611" height="840" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1615658613127" />
-    <state x="770" y="282" key="FileChooserDialogImpl" timestamp="1615649262701">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="770" y="282" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1615649262701" />
-    <state width="1751" height="279" key="GridCell.Tab.0.bottom" timestamp="1615799926907">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1751" height="279" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1615799926907" />
-    <state width="1751" height="279" key="GridCell.Tab.0.center" timestamp="1615799926907">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1751" height="279" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1615799926907" />
-    <state width="1751" height="279" key="GridCell.Tab.0.left" timestamp="1615799926907">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1751" height="279" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1615799926907" />
-    <state width="1751" height="279" key="GridCell.Tab.0.right" timestamp="1615799926907">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1751" height="279" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1615799926907" />
-    <state width="1751" height="344" key="GridCell.Tab.1.bottom" timestamp="1615799398407">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1751" height="344" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1615799398407" />
-    <state width="1751" height="344" key="GridCell.Tab.1.center" timestamp="1615799398407">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1751" height="344" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1615799398407" />
-    <state width="1751" height="344" key="GridCell.Tab.1.left" timestamp="1615799398406">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1751" height="344" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1615799398406" />
-    <state width="1751" height="344" key="GridCell.Tab.1.right" timestamp="1615799398407">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="1751" height="344" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1615799398407" />
-    <state width="905" height="520" key="XDebugger.FullValuePopup" timestamp="1615756899348">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state width="905" height="520" key="XDebugger.FullValuePopup/0.0.1920.1040@0.0.1920.1040" timestamp="1615756899348" />
-  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/gorm/db_context.go</url>
-          <line>53</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/gorm/db_context.go</url>
-          <line>45</line>
+          <line>47</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/gorm/db_context.go</url>
-          <line>64</line>
+          <line>68</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/gorm/db_context_test.go</url>
           <line>44</line>
           <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/gorm/db_transactions_test.go</url>
+          <line>34</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/testingutils/checkers.go</url>
+          <line>194</line>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
