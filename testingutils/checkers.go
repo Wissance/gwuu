@@ -22,21 +22,23 @@ func CheckStrings(t *testing.T, expected []string, actual []string, checkOrder b
 		assert.Nil(t, actual, "Checking that actual is nil")
 	}
     assert.Equal(t, len(expected), len(actual), "Checking that arrays length are equals")
-	usedObjects := make([]int, len(actual))
+	usedObjects := make([]int, 0)
 	for i, eItem := range expected {
 		if checkOrder {
 			assert.Equal(t, expected[i], actual[i])
 		} else {
 			unOrderedCheck := false
 			for j, aItem := range actual {
-			    if !contains(usedObjects, j) {
+				// if j (index) already contains
+				if !contains(usedObjects, j) {
 					if eItem == aItem {
 						unOrderedCheck = true
+						usedObjects = append(usedObjects, j)
 						break
 					}
 				}
 			}
-			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object {0} exists in actual array", eItem))
+			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object \"{0}\" exists in actual array", eItem))
 		}
 	}
 	return !t.Failed()
@@ -57,7 +59,7 @@ func CheckIntegers(t *testing.T, expected []int, actual []int, checkOrder bool) 
 		assert.Nil(t, actual, "Checking that actual is nil")
 	}
 	assert.Equal(t, len(expected), len(actual), "Checking that arrays length are equals")
-	usedObjects := make([]int, len(actual))
+	usedObjects := make([]int, 0)
 	for i, eItem := range expected {
 		if checkOrder {
 			assert.Equal(t, expected[i], actual[i])
@@ -67,11 +69,12 @@ func CheckIntegers(t *testing.T, expected []int, actual []int, checkOrder bool) 
 				if !contains(usedObjects, j) {
 					if eItem == aItem {
 						unOrderedCheck = true
+						usedObjects = append(usedObjects, j)
 						break
 					}
 				}
 			}
-			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object {0} exists in actual array", eItem))
+			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object \"{0}\" exists in actual array", eItem))
 		}
 	}
 }
@@ -91,7 +94,7 @@ func CheckIntegers64(t *testing.T, expected []int64, actual []int64, checkOrder 
 		assert.Nil(t, actual, "Checking that actual is nil")
 	}
 	assert.Equal(t, len(expected), len(actual), "Checking that arrays length are equals")
-	usedObjects := make([]int, len(actual))
+	usedObjects := make([]int, 0)
 	for i, eItem := range expected {
 		if checkOrder {
 			assert.Equal(t, expected[i], actual[i])
@@ -101,11 +104,12 @@ func CheckIntegers64(t *testing.T, expected []int64, actual []int64, checkOrder 
 				if !contains(usedObjects, j) {
 					if eItem == aItem {
 						unOrderedCheck = true
+						usedObjects = append(usedObjects, j)
 						break
 					}
 				}
 			}
-			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object {0} exists in actual array", eItem))
+			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object \"{0}\" exists in actual array", eItem))
 		}
 	}
 }
@@ -125,7 +129,7 @@ func CheckUnsignedIntegers(t *testing.T, expected []uint, actual []uint, checkOr
 		assert.Nil(t, actual, "Checking that actual is nil")
 	}
 	assert.Equal(t, len(expected), len(actual), "Checking that arrays length are equals")
-	usedObjects := make([]int, len(actual))
+	usedObjects := make([]int, 0)
 	for i, eItem := range expected {
 		if checkOrder {
 			assert.Equal(t, expected[i], actual[i])
@@ -135,11 +139,12 @@ func CheckUnsignedIntegers(t *testing.T, expected []uint, actual []uint, checkOr
 				if !contains(usedObjects, j) {
 					if eItem == aItem {
 						unOrderedCheck = true
+						usedObjects = append(usedObjects, j)
 						break
 					}
 				}
 			}
-			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object {0} exists in actual array", eItem))
+			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object \"{0}\" exists in actual array", eItem))
 		}
 	}
 }
@@ -159,7 +164,7 @@ func CheckUnsignedIntegers64(t *testing.T, expected []uint64, actual []uint64, c
 		assert.Nil(t, actual, "Checking that actual is nil")
 	}
 	assert.Equal(t, len(expected), len(actual), "Checking that arrays length are equals")
-	usedObjects := make([]int, len(actual))
+	usedObjects := make([]int, 0)
 	for i, eItem := range expected {
 		if checkOrder {
 			assert.Equal(t, expected[i], actual[i])
@@ -169,11 +174,12 @@ func CheckUnsignedIntegers64(t *testing.T, expected []uint64, actual []uint64, c
 				if !contains(usedObjects, j) {
 					if eItem == aItem {
 						unOrderedCheck = true
+						usedObjects = append(usedObjects, j)
 						break
 					}
 				}
 			}
-			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object {0} exists in actual array", eItem))
+			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object \"{0}\" exists in actual array", eItem))
 		}
 	}
 }
