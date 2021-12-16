@@ -22,6 +22,18 @@ func TestCheckStringsSuccessfulWithoutOrder(t *testing.T) {
 	assert.True(t, checkResult)
 }
 
+func TestCheckStringsSuccessfulWithOrder(t *testing.T) {
+	arr1 := []string{"", ""}
+	arr2 := []string{"", ""}
+	checkResult, _ := CheckStrings(t, arr1, arr2, true, true)
+	assert.True(t, checkResult)
+
+	arr1 = []string{"TextOne", "ТекстДва", "TextThree", "TextFore"}
+	arr2 = []string{"TextOne", "ТекстДва", "TextThree", "TextFore"}
+	checkResult, _ = CheckStrings(t, arr1, arr2, false, true)
+	assert.True(t, checkResult)
+}
+
 func TestCheckStringsFailsWithoutOrder(t *testing.T) {
 	arr1 := []string{"", ""}
 	arr2 := []string{" ", " "}
