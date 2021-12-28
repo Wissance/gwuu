@@ -84,19 +84,38 @@ func CheckStrings(t *testing.T, expected []string, actual []string, checkOrder b
  *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
  *  Functions return nothing and asserts if arrays are not equals
  */
-func CheckIntegers(t *testing.T, expected []int, actual []int, checkOrder bool) {
+func CheckIntegers(t *testing.T, expected []int, actual []int, checkOrder bool, assertErr bool) (bool, string) {
 	if expected == nil || actual == nil{
-		assert.Nil(t, expected, "Checking that expected is nil")
-		assert.Nil(t, actual, "Checking that actual is nil")
+		nilArraysCheck := expected == nil && actual == nil
+		if assertErr {
+			assert.Nil(t, expected, "Checking that expected is nil")
+			assert.Nil(t, actual, "Checking that actual is nil")
+		}
+		if nilArraysCheck {
+			return true, ""
+		}
+		return false, ExpectedOrActualBothNotNil
 	}
-	assert.Equal(t, len(expected), len(actual), "Checking that arrays length are equals")
+	if len(expected) != len(actual) {
+		if assertErr {
+			assert.Equal(t, len(expected), len(actual), "Checking that arrays length are equals")
+		}
+		return false, ArraysLengthAreNotSame
+	}
+
+	itemCheck := true
+	// created empty array that will be populated if we found items
 	usedObjects := make([]int, 0)
 	for i, eItem := range expected {
 		if checkOrder {
-			assert.Equal(t, expected[i], actual[i])
+			itemCheck = itemCheck && (expected[i] == actual[i])
+			if assertErr {
+				assert.Equal(t, expected[i], actual[i])
+			}
 		} else {
 			unOrderedCheck := false
 			for j, aItem := range actual {
+				// if j (index) already contains
 				if !contains(usedObjects, j) {
 					if eItem == aItem {
 						unOrderedCheck = true
@@ -105,9 +124,16 @@ func CheckIntegers(t *testing.T, expected []int, actual []int, checkOrder bool) 
 					}
 				}
 			}
-			assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object \"{0}\" exists in actual array", eItem))
+			itemCheck = itemCheck && unOrderedCheck
+			if assertErr {
+				assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object \"{0}\" exists in actual array", eItem))
+			}
+		}
+		if !itemCheck {
+			return false, stringFormatter.Format(ItemNotFound, eItem, i)
 		}
 	}
+	return true, ""
 }
 
 // CheckIntegers64
