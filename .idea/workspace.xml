@@ -34,9 +34,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7818d261-8cac-4167-9724-9ed24a23c2d7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/testingutils/checkers_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testingutils/checkers.go" beforeDir="false" afterPath="$PROJECT_DIR$/testingutils/checkers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testingutils/checkers_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/testingutils/checkers_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +52,14 @@
   <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
@@ -72,15 +79,18 @@
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/testingutils" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../soar" />
   </component>
   <component name="RunManager" selected="Go Test.go test testingutils">
-    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <configuration name="TestCheckStringsSuccessfulWithoutOrder in github.com/wissance/gwuu/testingutils" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="gwuu" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
+      <working_directory value="$PROJECT_DIR$/testingutils" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/wissance/gwuu/testingutils" />
+      <directory value="$PROJECT_DIR$/gorm" />
+      <framework value="gotest" />
+      <pattern value="^\QTestCheckStringsSuccessfulWithoutOrder\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestMssqlOpenSystemDb in db_context_test.go db_context.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -121,16 +131,6 @@
       <filePath value="$PROJECT_DIR$/gorm/db_context_test.go|$PROJECT_DIR$/gorm/db_context.go" />
       <framework value="gotest" />
       <pattern value="^TestMysqlOpenSystemDb$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestPostgresOpenSystemDb in db_context_test.go db_context.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="gwuu" />
-      <working_directory value="$PROJECT_DIR$/gorm" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$/gorm" />
-      <filePath value="$PROJECT_DIR$/gorm/db_context_test.go|$PROJECT_DIR$/gorm/db_context.go" />
-      <framework value="gotest" />
-      <pattern value="^TestPostgresOpenSystemDb$" />
       <method v="2" />
     </configuration>
     <configuration name="TestPostgresOpenSystemDb in db_context_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -187,16 +187,16 @@
       <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go db_context.go" />
       <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go" />
       <item itemvalue="Go Test.TestMysqlOpenSystemDb in db_context_test.go db_context.go" />
-      <item itemvalue="Go Test.TestPostgresOpenSystemDb in db_context_test.go db_context.go" />
       <item itemvalue="Go Test.TestPostgresOpenSystemDb in db_context_test.go" />
+      <item itemvalue="Go Test.TestCheckStringsSuccessfulWithoutOrder in github.com/wissance/gwuu/testingutils" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestCheckStringsSuccessfulWithoutOrder in github.com/wissance/gwuu/testingutils" />
         <item itemvalue="Go Test.TestMysqlOpenSystemDb in db_context_test.go db_context.go" />
         <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go db_context.go" />
         <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go" />
         <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go db_context.go" />
-        <item itemvalue="Go Test.TestPostgresOpenSystemDb in db_context_test.go" />
       </list>
     </recent_temporary>
   </component>
@@ -244,7 +244,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/testingutils/checkers.go</url>
-          <line>194</line>
+          <line>607</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
