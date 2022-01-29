@@ -254,3 +254,19 @@ func TestCheckFloat64FailsWithoutOrder(t *testing.T) {
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
+
+func TestCheckComplex64SuccessfulWithOrder(t *testing.T) {
+	arr1 := make([]complex64, 3)
+	arr1[0] = complex(10.55, 9.12)
+	arr1[1] = complex(99, 101)
+	arr1[2] = complex(55.9, 67.23)
+
+	arr2 := make([]complex64, 3)
+	arr2[0] = complex(11.01, 9.49)
+	arr2[1] = complex(99, 100.91)
+	arr2[2] = complex(55.6, 66.88)
+
+	checkResult, err := CheckComplexes(t, arr1, arr2, 0.5, true, true)
+	assert.True(t, checkResult)
+	assert.Empty(t, err)
+}
