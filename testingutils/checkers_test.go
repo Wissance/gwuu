@@ -126,3 +126,35 @@ func TestCheckIntegersFailsWithOrder(t *testing.T) {
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
+
+func TestCheckFloat32SuccessfulWithOrder(t *testing.T) {
+    arr1 := make([]float32, 3)
+    arr1[0] = 10.55
+    arr1[1] = 99
+    arr1[2] = 55.9
+
+    arr2 := make([]float32, 3)
+    arr2[0] = 11.01
+    arr2[1] = 99
+    arr2[2] = 55.6
+
+    checkResult, err := CheckFloats(t, arr1, arr2, 0.5, true, true)
+    assert.True(t, checkResult)
+    assert.Empty(t, err)
+}
+
+func TestCheckFloat32FailsWithOrder(t *testing.T) {
+	arr1 := make([]float32, 3)
+	arr1[0] = 10.55
+	arr1[1] = 99
+	arr1[2] = 55.9
+
+	arr2 := make([]float32, 3)
+	arr2[0] = 11.51
+	arr2[1] = 99
+	arr2[2] = 55.6
+
+	checkResult, err := CheckFloats(t, arr1, arr2, 0.5, true, false)
+	assert.False(t, checkResult)
+	assert.NotEmpty(t, err)
+}
