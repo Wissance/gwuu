@@ -354,7 +354,8 @@ func CheckFloats(t *testing.T, expected []float32, actual []float32, tolerance f
 			for j, aItem := range actual {
 				// if j (index) already contains
 				if !contains(usedObjects, j) {
-					if eItem == aItem {
+					comparisonResult := math.Abs(float64(eItem - aItem)) < tolerance
+					if comparisonResult {
 						unOrderedCheck = true
 						usedObjects = append(usedObjects, j)
 						break
@@ -373,8 +374,58 @@ func CheckFloats(t *testing.T, expected []float32, actual []float32, tolerance f
 	return true, ""
 }
 
-func CheckFloats64(t *testing.T, expected []float64, actual []float64, precision float64, checkOrder bool) {
+func CheckFloats64(t *testing.T, expected []float64, actual []float64, tolerance float64, checkOrder bool, assertErr bool) (bool, string)  {
+	if expected == nil || actual == nil{
+		nilArraysCheck := expected == nil && actual == nil
+		if assertErr {
+			assert.Nil(t, expected, "Checking that expected is nil")
+			assert.Nil(t, actual, "Checking that actual is nil")
+		}
+		if nilArraysCheck {
+			return true, ""
+		}
+		return false, ExpectedOrActualBothNotNil
+	}
+	if len(expected) != len(actual) {
+		if assertErr {
+			assert.Equal(t, len(expected), len(actual), "Checking that arrays length are equals")
+		}
+		return false, ArraysLengthAreNotSame
+	}
 
+	itemCheck := true
+	// created empty array that will be populated if we found items
+	usedObjects := make([]int, 0)
+	for i, eItem := range expected {
+		if checkOrder {
+			comparisonResult := math.Abs(expected[i] - actual[i]) < tolerance
+			itemCheck = itemCheck && comparisonResult
+			if assertErr {
+				assert.Equal(t, expected[i], actual[i])
+			}
+		} else {
+			unOrderedCheck := false
+			for j, aItem := range actual {
+				// if j (index) already contains
+				if !contains(usedObjects, j) {
+					comparisonResult := math.Abs(eItem - aItem) < tolerance
+					if comparisonResult {
+						unOrderedCheck = true
+						usedObjects = append(usedObjects, j)
+						break
+					}
+				}
+			}
+			itemCheck = itemCheck && unOrderedCheck
+			if assertErr {
+				assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object \"{0}\" exists in actual array", eItem))
+			}
+		}
+		if !itemCheck {
+			return false, stringFormatter.Format(ItemNotFound, eItem, i)
+		}
+	}
+	return true, ""
 }
 
 func CheckComplexes(t *testing.T, expected []complex64, actual []complex64, precision float64, checkOrder bool) {
