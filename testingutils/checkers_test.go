@@ -190,3 +190,67 @@ func TestCheckFloat32FailsWithoutOrder(t *testing.T) {
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
+
+func TestCheckFloat64SuccessfulWithOrder(t *testing.T) {
+	arr1 := make([]float64, 3)
+	arr1[0] = 10.55
+	arr1[1] = 99
+	arr1[2] = 55.9
+
+	arr2 := make([]float64, 3)
+	arr2[0] = 11.01
+	arr2[1] = 99
+	arr2[2] = 55.6
+
+	checkResult, err := CheckFloats64(t, arr1, arr2, 0.5, true, true)
+	assert.True(t, checkResult)
+	assert.Empty(t, err)
+}
+
+func TestCheckFloat64FailsWithOrder(t *testing.T) {
+	arr1 := make([]float64, 3)
+	arr1[0] = 10.55
+	arr1[1] = 99
+	arr1[2] = 55.9
+
+	arr2 := make([]float64, 3)
+	arr2[0] = 11.51
+	arr2[1] = 99
+	arr2[2] = 55.6
+
+	checkResult, err := CheckFloats64(t, arr1, arr2, 0.5, true, false)
+	assert.False(t, checkResult)
+	assert.NotEmpty(t, err)
+}
+
+func TestCheckFloat64SuccessfulWithoutOrder(t *testing.T) {
+	arr1 := make([]float64, 3)
+	arr1[0] = 129.489
+	arr1[1] = 1173.1
+	arr1[2] = 199.64
+
+	arr2 := make([]float64, 3)
+	arr2[0] = 1172.77
+	arr2[1] = 199.99
+	arr2[2] = 129.123
+
+	checkResult, err := CheckFloats64(t, arr1, arr2, 0.5, false, true)
+	assert.True(t, checkResult)
+	assert.Empty(t, err)
+}
+
+func TestCheckFloat64FailsWithoutOrder(t *testing.T) {
+	arr1 := make([]float32, 3)
+	arr1[0] = 129.489
+	arr1[1] = 1173.1
+	arr1[2] = 199.64
+
+	arr2 := make([]float32, 3)
+	arr2[0] = 1172.77
+	arr2[1] = 299.99
+	arr2[2] = 129.123
+
+	checkResult, err := CheckFloats(t, arr1, arr2, 0.5, true, false)
+	assert.False(t, checkResult)
+	assert.NotEmpty(t, err)
+}
