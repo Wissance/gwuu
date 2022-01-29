@@ -401,7 +401,7 @@ func CheckFloats64(t *testing.T, expected []float64, actual []float64, tolerance
 			comparisonResult := math.Abs(expected[i] - actual[i]) < tolerance
 			itemCheck = itemCheck && comparisonResult
 			if assertErr {
-				assert.Equal(t, expected[i], actual[i])
+				assert.True(t, comparisonResult)
 			}
 		} else {
 			unOrderedCheck := false
