@@ -14,15 +14,16 @@ const (
 )
 
 // CheckStrings
-/*  This function allow us to compare two arrays of Strings with order and without it and with asserts (assertErr is true) and without
+/*  This function allow us to compare two arrays of Strings with order and without it and with asserts (assertErr is true) and without order
+*   This function could work without assert (see assertErr param)
  *  Parameters:
  *     - t is Test State, because we provide functions to check equality in tests
  *     - expected - one array of strings
  *     - actual - another array of strings
  *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
- *     - assertErr - assert if True otherwise just use a result
+ *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
  *  Functions return nothing and asserts if arrays are not equals
- *  Returns true if there is no assert fail, otherwise - false
+ *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
  */
 func CheckStrings(t *testing.T, expected []string, actual []string, checkOrder bool, assertErr bool) (bool, string) {
 	if expected == nil || actual == nil{
@@ -78,12 +79,15 @@ func CheckStrings(t *testing.T, expected []string, actual []string, checkOrder b
 
 // CheckIntegers
 /*  This function allow us to compare two arrays of int's with order and without it
+*   This function could work without assert (see assertErr param)
  *  Parameters:
  *     - t is Test State, because we provide functions to check equality in tests
  *     - expected - one array of int
  *     - actual - another array of int
  *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
+ *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
  *  Functions return nothing and asserts if arrays are not equals
+ *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
  */
 func CheckIntegers(t *testing.T, expected []int, actual []int, checkOrder bool, assertErr bool) (bool, string) {
 	if expected == nil || actual == nil{
@@ -139,12 +143,15 @@ func CheckIntegers(t *testing.T, expected []int, actual []int, checkOrder bool, 
 
 // CheckIntegers64
 /*  This function allow us to check two arrays of int64 with order and without it
+*   This function could work without assert (see assertErr param)
  *  Parameters:
  *     - t is Test State, because we provide functions to check equality in tests
  *     - expected - one array of int64
  *     - actual - another array of int64
  *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
+ *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
  *  Functions return nothing and asserts if arrays are not equals
+ *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
  */
 func CheckIntegers64(t *testing.T, expected []int64, actual []int64, checkOrder bool, assertErr bool) (bool, string) {
 	if expected == nil || actual == nil{
@@ -200,12 +207,15 @@ func CheckIntegers64(t *testing.T, expected []int64, actual []int64, checkOrder 
 
 // CheckUnsignedIntegers
 /*  This function allow us to compare two arrays of uint with order and without it
+*   This function could work without assert (see assertErr param)
  *  Parameters:
  *     - t is Test State, because we provide functions to check equality in tests
  *     - expected - one array of uint
  *     - actual - another array of uint
  *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
+ *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
  *  Functions return nothing and asserts if arrays are not equals
+ *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
  */
 func CheckUnsignedIntegers(t *testing.T, expected []uint, actual []uint, checkOrder bool, assertErr bool) (bool, string) {
 	if expected == nil || actual == nil{
@@ -261,12 +271,15 @@ func CheckUnsignedIntegers(t *testing.T, expected []uint, actual []uint, checkOr
 
 // CheckUnsignedIntegers64
 /*  This function allow us to compare two arrays of uint64 with order and without it
+*   This function could work without assert (see assertErr param)
  *  Parameters:
  *     - t is Test State, because we provide functions to check equality in tests
  *     - expected - one array of uint64
  *     - actual - another array of uint64
  *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
+ *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
  *  Functions return nothing and asserts if arrays are not equals
+ *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
  */
 func CheckUnsignedIntegers64(t *testing.T, expected []uint64, actual []uint64, checkOrder bool, assertErr bool) (bool, string) {
 	if expected == nil || actual == nil{
@@ -320,6 +333,19 @@ func CheckUnsignedIntegers64(t *testing.T, expected []uint64, actual []uint64, c
 	return true, ""
 }
 
+// CheckFloats
+/*  This function allow us to compare two arrays of float32 with order and without it with tolerance
+*   This function could work without assert (see assertErr param)
+ *  Parameters:
+ *     - t is Test State, because we provide functions to check equality in tests
+ *     - expected - one array of float32
+ *     - actual - another array of float32
+ *     - tolerance - tolerance between array items, used as math.abs(expected - actual) < tolerance
+ *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
+ *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
+ *  Functions return nothing and asserts if arrays are not equals
+ *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
+ */
 func CheckFloats(t *testing.T, expected []float32, actual []float32, tolerance float64, checkOrder bool, assertErr bool) (bool, string) {
 	if expected == nil || actual == nil{
 		nilArraysCheck := expected == nil && actual == nil
@@ -374,6 +400,19 @@ func CheckFloats(t *testing.T, expected []float32, actual []float32, tolerance f
 	return true, ""
 }
 
+// CheckFloats64
+/*  This function allow us to compare two arrays of float64 with order and without it with tolerance
+*   This function could work without assert (see assertErr param)
+ *  Parameters:
+ *     - t is Test State, because we provide functions to check equality in tests
+ *     - expected - one array of float64
+ *     - actual - another array of float64
+ *     - tolerance - tolerance between array items, used as math.abs(expected - actual) < tolerance
+ *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
+ *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
+ *  Functions return nothing and asserts if arrays are not equals
+ *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
+*/
 func CheckFloats64(t *testing.T, expected []float64, actual []float64, tolerance float64, checkOrder bool, assertErr bool) (bool, string)  {
 	if expected == nil || actual == nil{
 		nilArraysCheck := expected == nil && actual == nil
