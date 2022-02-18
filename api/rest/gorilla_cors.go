@@ -46,8 +46,9 @@ func EnableCorsAllOrigin(respWriter *http.ResponseWriter) {
  * Returns nothing
  */
 func EnableCors(respWriter *http.ResponseWriter, origin string, methods string) {
+	(*respWriter).Header().Set(AccessControlAllowHeadersHeader, AllowAllHeaderValues)
 	(*respWriter).Header().Set(AccessControlAllowOriginHeader, origin)
-	(*respWriter).Header().Set(AccessControlAllowHeadersHeader, methods)
+	(*respWriter).Header().Set(AccessControlAllowMethodsHeader, methods)
 }
 
 // HandleFunc
@@ -59,24 +60,39 @@ func EnableCors(respWriter *http.ResponseWriter, origin string, methods string) 
  * Parameters:
  * Return *Route
  */
-func (handler *WebApiHandler) HandleFunc(url string, f func(http.ResponseWriter, *http.Request), handlerMethods ...string) *m.Route {
+func (handler *WebApiHandler) HandleFunc(path string, f func(http.ResponseWriter, *http.Request), handlerMethods ...string) *m.Route {
 	// 1. Create Route ...
-	route := handler.Router.HandleFunc(url, f).Methods(handlerMethods...)
+	route := handler.Router.HandleFunc(path, f).Methods(handlerMethods...)
 	if handler.AllowCors {
 		// 2. Create Options route
-		optionRouteName := stringFormatter.Format("{0}_{1}", url, optionsRouteSuffix)
+		optionRouteName := stringFormatter.Format("{0}_{1}", path, optionsRouteSuffix)
 		optionsRoute := handler.Router.GetRoute(optionRouteName)
 		if optionsRoute == nil {
-			// there is no Route with such name, so we could easily create it and assign methods = handlerMethods + "OPTIONS"
-			// set Router
+			// there is no Route with such name, so we could easily create it and assign methods = "OPTIONS" + handlerMethods
 			handler.corsConfig[optionRouteName] = []string{"OPTIONS"}
-			// combine with handlerMethods
-			// assign Handler
-		} else {
-			// route already exists, therefore we should only append missing methods
-			// append handlerMethods
-			// update RouteMethods
+			// assign OPTIONS Handler
+			handler.Router.HandleFunc(path, handler.handleCors).Methods("OPTIONS")
 		}
+		// combine with handlerMethods
+		handler.corsConfig[optionRouteName] = append(handler.corsConfig[optionRouteName], handlerMethods...)
 	}
 	return route
+}
+
+func (handler *WebApiHandler) handleCors(respWriter http.ResponseWriter, request *http.Request) {
+	optionRouteName := stringFormatter.Format("{0}_{1}", request.URL.Path, optionsRouteSuffix)
+	methods := handler.corsConfig[optionRouteName]
+	methodsStr := join(methods, ",")
+	EnableCors(&respWriter, handler.Origin, methodsStr)
+}
+
+func join(values []string, separator string) string {
+	var line string
+	for i, v := range values {
+		line = line + v
+		if i != len(values)-1 {
+			line = line + separator
+		}
+	}
+	return line
 }
