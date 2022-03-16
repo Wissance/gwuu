@@ -89,7 +89,7 @@ func (handler *WebApiHandler) HandleFunc(path string, f func(http.ResponseWriter
 			// there is no Route with such name, so we could easily create it and assign methods = "OPTIONS" + handlerMethods
 			handler.corsConfig[optionRouteName] = []string{"OPTIONS"}
 			// assign OPTIONS Handler
-			handler.Router.HandleFunc(path, handler.handleCors).Methods("OPTIONS")
+			handler.Router.HandleFunc(path, handler.handleCors).Methods("OPTIONS").Name(optionRouteName)
 		}
 		// combine with handlerMethods
 		handler.corsConfig[optionRouteName] = append(handler.corsConfig[optionRouteName], handlerMethods...)
