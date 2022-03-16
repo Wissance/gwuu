@@ -12,19 +12,36 @@ const (
 	AccessControlAllowOriginHeader = "Access-Control-Allow-Origin"
 	AccessControlAllowHeadersHeader = "Access-Control-Allow-Headers"
 	// Value that allow all headers
+	AnyOrigin = "*"
 	AllowAllHeaderValues = "*"
 	optionsRouteSuffix = "opts"
 )
-
-/*type WebApi interface {
-	//Create()
-}*/
 
 type WebApiHandler struct {
 	corsConfig map[string][]string
 	AllowCors bool
 	Origin string
 	Router *m.Router
+}
+
+// NewWebApiHandler
+/* This function creates instance of WebApiHandler and inits properties with arguments values
+ * Parameters:
+ *    - allowCors - represents should be course configured (true) or not
+ *    - origin - represents ip/domain or * (AnyOrigin) name which will be used response headers
+ */
+func NewWebApiHandler(allowCors bool, origin string) *WebApiHandler {
+	handler := &WebApiHandler{
+		AllowCors: allowCors,
+		Origin: origin,
+		Router: m.NewRouter(),
+		corsConfig: map[string][]string{},
+	}
+	if allowCors {
+		handler.Router.Use(m.CORSMethodMiddleware(handler.Router))
+	}
+
+	return handler
 }
 
 // EnableCorsAllOrigin
@@ -58,6 +75,7 @@ func EnableCors(respWriter *http.ResponseWriter, origin string, methods string) 
  * values OPTIONS, GET, POST. Our HandleFunc allow to reduce a complexity of router config because using our HandleFunc we take service on
  * handling OPTIONS method by our HandleFunc.
  * Parameters:
+ *
  * Return *Route
  */
 func (handler *WebApiHandler) HandleFunc(path string, f func(http.ResponseWriter, *http.Request), handlerMethods ...string) *m.Route {
