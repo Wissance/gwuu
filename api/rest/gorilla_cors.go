@@ -75,21 +75,23 @@ func EnableCors(respWriter *http.ResponseWriter, origin string, methods string) 
  * values OPTIONS, GET, POST. Our HandleFunc allow to reduce a complexity of router config because using our HandleFunc we take service on
  * handling OPTIONS method by our HandleFunc.
  * Parameters:
- *
+ *     - router - router to which we assign handler func this is implemented for sub routers supports
+ *     - path - url
+ *     - f - handler function that handles request
  * Return *Route
  */
-func (handler *WebApiHandler) HandleFunc(path string, f func(http.ResponseWriter, *http.Request), handlerMethods ...string) *m.Route {
+func (handler *WebApiHandler) HandleFunc(router *m.Router, path string, f func(http.ResponseWriter, *http.Request), handlerMethods ...string) *m.Route {
 	// 1. Create Route ...
-	route := handler.Router.HandleFunc(path, f).Methods(handlerMethods...)
+	route := router.HandleFunc(path, f).Methods(handlerMethods...)
 	if handler.AllowCors {
 		// 2. Create Options route
 		optionRouteName := stringFormatter.Format("{0}_{1}", path, optionsRouteSuffix)
-		optionsRoute := handler.Router.GetRoute(optionRouteName)
+		optionsRoute := router.GetRoute(optionRouteName)
 		if optionsRoute == nil {
 			// there is no Route with such name, so we could easily create it and assign methods = "OPTIONS" + handlerMethods
 			handler.corsConfig[optionRouteName] = []string{"OPTIONS"}
 			// assign OPTIONS Handler
-			handler.Router.HandleFunc(path, handler.handleCors).Methods("OPTIONS").Name(optionRouteName)
+			router.HandleFunc(path, handler.handleCors).Methods("OPTIONS").Name(optionRouteName)
 		}
 		// combine with handlerMethods
 		handler.corsConfig[optionRouteName] = append(handler.corsConfig[optionRouteName], handlerMethods...)

@@ -15,25 +15,25 @@ func TestHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 	handler := NewWebApiHandler(true, AnyOrigin)
 	// Get only method
 	realmResource := "/api/realm/"
-	handler.HandleFunc(realmResource, func(writer http.ResponseWriter, request *http.Request) {
+	handler.HandleFunc(handler.Router, realmResource, func(writer http.ResponseWriter, request *http.Request) {
 
 	}, "GET")
 	// full crud
 	userResourceRoot := "/api/user/"
-	handler.HandleFunc(userResourceRoot, func(writer http.ResponseWriter, request *http.Request) {
+	handler.HandleFunc(handler.Router, userResourceRoot, func(writer http.ResponseWriter, request *http.Request) {
 
 	}, "GET")
-	handler.HandleFunc(userResourceRoot, func(writer http.ResponseWriter, request *http.Request) {
+	handler.HandleFunc(handler.Router, userResourceRoot, func(writer http.ResponseWriter, request *http.Request) {
 
 	}, "POST")
 	userResourceById := "/api/user/{id:[0-9]+}/"
-	handler.HandleFunc(userResourceById, func(writer http.ResponseWriter, request *http.Request) {
+	handler.HandleFunc(handler.Router, userResourceById, func(writer http.ResponseWriter, request *http.Request) {
 
 	}, "GET")
-	handler.HandleFunc(userResourceById, func(writer http.ResponseWriter, request *http.Request) {
+	handler.HandleFunc(handler.Router, userResourceById, func(writer http.ResponseWriter, request *http.Request) {
 
 	}, "PUT")
-	handler.HandleFunc(userResourceById, func(writer http.ResponseWriter, request *http.Request) {
+	handler.HandleFunc(handler.Router, userResourceById, func(writer http.ResponseWriter, request *http.Request) {
 
 	}, "DELETE")
 
@@ -51,6 +51,12 @@ func TestHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 	route = handler.Router.Get(userByIdOptionRouteName)
 	assert.NotNil(t, route)
 	checkOptionRouteCors(t, route, userResourceById, "*", "*", "OPTIONS,GET,PUT,DELETE" )
+}
+
+func TestHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
+	// there is no sub router access yet ...
+	//handler := NewWebApiHandler(true, AnyOrigin)
+	//handler.Router.
 }
 
 func checkOptionRouteCors(t *testing.T, route *mux.Route, requestPath string, allowedOrigin string, allowedHeader string, allowedMethods string) {
