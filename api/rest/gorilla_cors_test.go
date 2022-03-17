@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"github.com/wissance/stringFormatter"
 	"net/http"
@@ -34,7 +35,8 @@ func TestHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 	realmOptionRoute := stringFormatter.Format("{0}_{1}", realmResource, optionsRouteSuffix)
 	route := handler.Router.Get(realmOptionRoute)
 	assert.NotNil(t, route)
-	m, _ := route.Methods().GetMethods()
+	checkOptionRouteCors(t, route,realmResource, "*", "*", "OPTIONS,GET" )
+	/*m, _ := route.Methods().GetMethods()
 	assert.Equal(t, 1, len(m))
 	assert.Equal(t, "OPTIONS", m[0])
 	request := http.Request{URL: &url.URL{Scheme: "http", Host: "127.0.0.1", Path: realmResource},
@@ -43,6 +45,18 @@ func TestHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 	route.GetHandler().ServeHTTP(writer, &request)
 	assert.Equal(t, "*", writer.Header().Get(AccessControlAllowOriginHeader))
 	assert.Equal(t, "*", writer.Header().Get(AccessControlAllowHeadersHeader))
-	assert.Equal(t, "OPTIONS,GET", writer.Header().Get(AccessControlAllowMethodsHeader))
+	assert.Equal(t, "OPTIONS,GET", writer.Header().Get(AccessControlAllowMethodsHeader))*/
+}
 
+func checkOptionRouteCors(t *testing.T, route *mux.Route, requestPath string, allowedOrigin string, allowedHeader string, allowedMethods string) {
+	m, _ := route.Methods().GetMethods()
+	assert.Equal(t, 1, len(m))
+	assert.Equal(t, "OPTIONS", m[0])
+	request := http.Request{URL: &url.URL{Scheme: "http", Host: "127.0.0.1", Path: requestPath},
+		Method: "OPTIONS"}
+	writer := httptest.NewRecorder()
+	route.GetHandler().ServeHTTP(writer, &request)
+	assert.Equal(t, allowedOrigin, writer.Header().Get(AccessControlAllowOriginHeader))
+	assert.Equal(t, allowedHeader, writer.Header().Get(AccessControlAllowHeadersHeader))
+	assert.Equal(t, allowedMethods, writer.Header().Get(AccessControlAllowMethodsHeader))
 }
