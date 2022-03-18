@@ -70,15 +70,16 @@ func EnableCors(respWriter *http.ResponseWriter, origin string, methods string) 
 
 // HandleFunc
 /* This is a Proxy function that assign handler to handle specific route by url but also simultaneously it configures CORS handler.
+ * This function is almost equal to mux.Router.HandleFunc except fact that we passing 
  * We are working here with route names for OPTIONS handler i.e. we have REST resource /api/good and 2 separate handlers for GET and POST
  * therefore for proper CORS handle we should respond on OPTIONS /api/good with empty body and header AccessControlAllowMethodsHeader with
  * values OPTIONS, GET, POST. Our HandleFunc allow to reduce a complexity of router config because using our HandleFunc we take service on
  * handling OPTIONS method by our HandleFunc.
  * Parameters:
  *     - router - router to which we assign handler func this is implemented for sub routers supports
- *     - path - url
+ *     - path - url of route (request)
  *     - f - handler function that handles request
- * Return *Route
+ * Return created route like router.HandleFunc do
  */
 func (handler *WebApiHandler) HandleFunc(router *m.Router, path string, f func(http.ResponseWriter, *http.Request), handlerMethods ...string) *m.Route {
 	// 1. Create Route ...
