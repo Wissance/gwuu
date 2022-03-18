@@ -13,7 +13,7 @@ Contains following tools:
 * api/rest - a set of extensions for gorilla/mux^
     - easy register HandlerFunc and you'll get auto Preflight handler register too (response on OPTION resource) so that you API automatically support CORS now.
 
-## Gorm
+## 1. Gorm
 As were mentioned above we could make connection to any database (MySql, MsSql or Postgres) with creation specified database before, drop database. This functionality
 is especially useful in unit tests. I.e. (see unit tests for more details)
 
@@ -50,7 +50,7 @@ func testOpenDbWithCreateAndCheck(t *testing.T, connStr string, dialect SqlDiale
 }
 ```
 
-## Testingutils
+## 2. Testingutils
 
 Contains following features:
 * a set of CheckType functions that allow to compare **ARRAYS** of primitive types i.e. CheckStrings, CheckFloats64, CheckComplexes & others for comparison 
@@ -103,6 +103,42 @@ func TestCheckComplex64SuccessfulWithOrder(t *testing.T) {
 }
 ```
 
+## 3. Api/rest
+This package is a extension for ***gorilla/mux***. In our lib we are having `HandleFunc` function which signature is almost equals to `mux.Router.HandleFunc`. Using `HandleFunc` from ***gwuu*** you will forget about Preflight Handlers register (OPTIONS method), they registers automatically and no more additional HandlerFunc anymore for OPTIONS method handling! See example:
+
+```go
+handler := NewWebApiHandler(true, AnyOrigin)
+	// Get only method
+	realmResource := "/api/realm/"
+	handler.HandleFunc(handler.Router, realmResource, func(writer http.ResponseWriter, request *http.Request) {
+
+	}, "GET")
+	// full crud
+	userResourceRoot := "/api/user/"
+	handler.HandleFunc(handler.Router, userResourceRoot, func(writer http.ResponseWriter, request *http.Request) {
+
+	}, "GET")
+	handler.HandleFunc(handler.Router, userResourceRoot, func(writer http.ResponseWriter, request *http.Request) {
+
+	}, "POST")
+	userResourceById := "/api/user/{id:[0-9]+}/"
+	handler.HandleFunc(handler.Router, userResourceById, func(writer http.ResponseWriter, request *http.Request) {
+
+	}, "GET")
+	handler.HandleFunc(handler.Router, userResourceById, func(writer http.ResponseWriter, request *http.Request) {
+
+	}, "PUT")
+	handler.HandleFunc(handler.Router, userResourceById, func(writer http.ResponseWriter, request *http.Request) {
+
+	}, "DELETE")
+```
+
+Condider above example you also get 3 additional automatical OPTIONS method handlers for:
+* OPTIONS /api/realm/
+* OPTIONS /api/user/
+* OPTIONS /api/user/{id}/
+
+Using our HandlerFunc you won't ever get CORS Error in JS frameworks/Web Browser.
 
 # Useful materials
 * our article on medium about how to work with https://m-ushakov.medium.com/intricacies-of-working-with-gorm-3d336f310
