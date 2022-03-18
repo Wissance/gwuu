@@ -10,6 +10,8 @@ Contains following tools:
     - get portion of data
 
 * testingutils - a set of utils that makes unit testing easily
+* api/rest - a set of extensions for gorilla/mux^
+    - easy register HandlerFunc and you'll get auto Preflight handler register too (response on OPTION resource) so that you API automatically support CORS now.
 
 ## Gorm
 As were mentioned above we could make connection to any database (MySql, MsSql or Postgres) with creation specified database before, drop database. This functionality
