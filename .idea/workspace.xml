@@ -35,7 +35,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7818d261-8cac-4167-9724-9ed24a23c2d7" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testingutils/checkers_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/testingutils/checkers_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,7 +80,12 @@
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../soar" />
   </component>
-  <component name="RunManager" selected="Go Test.go test testingutils">
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\mushakov\projects\gwuu\api\rest" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Go Test.TestHandleFuncWithCorsWithAnyOrigin in github.com/wissance/gwuu/api/rest">
     <configuration name="TestCheckStringsSuccessfulWithoutOrder in github.com/wissance/gwuu/testingutils" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="gwuu" />
       <working_directory value="$PROJECT_DIR$/testingutils" />
@@ -91,6 +95,17 @@
       <directory value="$PROJECT_DIR$/gorm" />
       <framework value="gotest" />
       <pattern value="^\QTestCheckStringsSuccessfulWithoutOrder\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestHandleFuncWithCorsWithAnyOrigin in github.com/wissance/gwuu/api/rest" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="gwuu" />
+      <working_directory value="$PROJECT_DIR$/api/rest" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/wissance/gwuu/api/rest" />
+      <directory value="$PROJECT_DIR$/gorm" />
+      <framework value="gotest" />
+      <pattern value="^\QTestHandleFuncWithCorsWithAnyOrigin\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestMssqlOpenSystemDb in db_context_test.go db_context.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -133,16 +148,6 @@
       <pattern value="^TestMysqlOpenSystemDb$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestPostgresOpenSystemDb in db_context_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="gwuu" />
-      <working_directory value="$PROJECT_DIR$/gorm" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$/gorm" />
-      <filePath value="$PROJECT_DIR$/gorm/db_context_test.go" />
-      <framework value="gotest" />
-      <pattern value="^TestPostgresOpenSystemDb$" />
-      <method v="2" />
-    </configuration>
     <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
       <module name="gwuu" />
       <working_directory value="$PROJECT_DIR$/" />
@@ -170,33 +175,33 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
-    <configuration name="go test testingutils" type="GoTestRunConfiguration" factoryName="Go Test" nameIsGenerated="true">
+    <configuration name="go test rest" type="GoTestRunConfiguration" factoryName="Go Test" nameIsGenerated="true">
       <module name="gwuu" />
-      <working_directory value="$PROJECT_DIR$/testingutils" />
+      <working_directory value="$PROJECT_DIR$/api/rest" />
       <go_parameters value="-i" />
       <kind value="DIRECTORY" />
-      <directory value="$PROJECT_DIR$/testingutils" />
-      <output_directory value="$PROJECT_DIR$/testingutils" />
+      <directory value="$PROJECT_DIR$/api/rest" />
+      <output_directory value="$PROJECT_DIR$/api/rest" />
       <framework value="gotest" />
       <method v="2" />
     </configuration>
     <list>
       <item itemvalue="Go Test.go test gorm" />
       <item itemvalue="Go Test.go test gwuu/gorm" />
-      <item itemvalue="Go Test.go test testingutils" />
+      <item itemvalue="Go Test.go test rest" />
+      <item itemvalue="Go Test.TestCheckStringsSuccessfulWithoutOrder in github.com/wissance/gwuu/testingutils" />
       <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go db_context.go" />
       <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go" />
       <item itemvalue="Go Test.TestMysqlOpenSystemDb in db_context_test.go db_context.go" />
-      <item itemvalue="Go Test.TestPostgresOpenSystemDb in db_context_test.go" />
-      <item itemvalue="Go Test.TestCheckStringsSuccessfulWithoutOrder in github.com/wissance/gwuu/testingutils" />
+      <item itemvalue="Go Test.TestHandleFuncWithCorsWithAnyOrigin in github.com/wissance/gwuu/api/rest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestHandleFuncWithCorsWithAnyOrigin in github.com/wissance/gwuu/api/rest" />
         <item itemvalue="Go Test.TestCheckStringsSuccessfulWithoutOrder in github.com/wissance/gwuu/testingutils" />
         <item itemvalue="Go Test.TestMysqlOpenSystemDb in db_context_test.go db_context.go" />
         <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go db_context.go" />
         <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go" />
-        <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go db_context.go" />
       </list>
     </recent_temporary>
   </component>
@@ -246,6 +251,11 @@
           <url>file://$PROJECT_DIR$/testingutils/checkers.go</url>
           <line>607</line>
           <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/api/rest/gorilla_cors_test.go</url>
+          <line>41</line>
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
