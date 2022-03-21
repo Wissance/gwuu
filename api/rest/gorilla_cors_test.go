@@ -37,8 +37,6 @@ func TestHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 
 	}, "DELETE")
 
-	// go http.ListenAndServe("127.0.0.1:8687", handler.Router)
-
 	checkOptionRouteCors(t, handler.Router, realmResource, AnyOrigin, "*", "OPTIONS,GET" )
 	checkOptionRouteCors(t, handler.Router, userResourceRoot, AnyOrigin, "*", "OPTIONS,GET,POST" )
 
@@ -50,7 +48,7 @@ func TestHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 	// there is no sub router access yet ...
 	internalSubNet := "192.168.30.0"
 	handler := NewWebApiHandler(true, internalSubNet)
-	service1Router := handler.Router.PathPrefix("service1").Subrouter()
+	service1Router := handler.Router.PathPrefix("/service1/").Subrouter()
 
 	objectResource := "/api/object/"
 	handler.HandleFunc(service1Router, objectResource, func(writer http.ResponseWriter, request *http.Request) {
@@ -61,7 +59,7 @@ func TestHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 
 	}, "POST")
 
-	service2Router := handler.Router.PathPrefix("service2").Subrouter()
+	service2Router := handler.Router.PathPrefix("/service2/").Subrouter()
 	classRootResource := "/api/class/"
 
 	handler.HandleFunc(service2Router, classRootResource, func(writer http.ResponseWriter, request *http.Request) {
@@ -77,11 +75,11 @@ func TestHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 
 	}, "DELETE")
 
-	checkOptionRouteCors(t, handler.Router, "service1" + objectResource, internalSubNet, "*", "OPTIONS,GET,POST" )
-	//checkOptionRouteCors(t, handler.Router, "service2" + classRootResource, internalSubNet, "*", "OPTIONS,GET,POST" )
+	checkOptionRouteCors(t, handler.Router, "/service1" + objectResource, internalSubNet, "*", "OPTIONS,GET,POST" )
+	checkOptionRouteCors(t, handler.Router, "/service2" + classRootResource, internalSubNet, "*", "OPTIONS,GET,POST" )
 
-	//classById := "/api/class/356/"
-	//checkOptionRouteCors(t, handler.Router, "service2" + classById, internalSubNet, "*", "OPTIONS,DELETE" )
+	classById := "/api/class/356/"
+	checkOptionRouteCors(t, handler.Router, "/service2" + classById, internalSubNet, "*", "OPTIONS,DELETE" )
 }
 
 func checkOptionRouteCors(t *testing.T, router *mux.Router, requestPath string, allowedOrigin string, allowedHeader string, allowedMethods string) {
