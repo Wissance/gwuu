@@ -69,10 +69,14 @@ func EnableCors(respWriter *http.ResponseWriter, origin string, methods string) 
 }
 
 func (handler *WebApiHandler) handlePreflightReq(respWriter http.ResponseWriter, request *http.Request) {
-	optionRouteName := stringFormatter.Format("{0}_{1}", request.URL.Path, optionsRouteSuffix)
-	methods := handler.corsConfig[optionRouteName]
-	methodsStr := join(methods, ",")
-	EnableCors(&respWriter, handler.Origin, methodsStr)
+	route := m.CurrentRoute(request)
+	if route != nil {
+		optionRouteName := route.GetName()
+		// stringFormatter.Format("{0}_{1}", request.URL.Path, optionsRouteSuffix)
+		methods := handler.corsConfig[optionRouteName]
+		methodsStr := join(methods, ",")
+		EnableCors(&respWriter, handler.Origin, methodsStr)
+	}
 }
 
 func join(values []string, separator string) string {
