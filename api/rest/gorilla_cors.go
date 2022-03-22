@@ -68,6 +68,28 @@ func EnableCors(respWriter *http.ResponseWriter, origin string, methods string) 
 	(*respWriter).Header().Set(AccessControlAllowMethodsHeader, methods)
 }
 
+func (handler *WebApiHandler) handlePreflightReq(respWriter http.ResponseWriter, request *http.Request) {
+	route := m.CurrentRoute(request)
+	if route != nil {
+		optionRouteName := route.GetName()
+		// stringFormatter.Format("{0}_{1}", request.URL.Path, optionsRouteSuffix)
+		methods := handler.corsConfig[optionRouteName]
+		methodsStr := join(methods, ",")
+		EnableCors(&respWriter, handler.Origin, methodsStr)
+	}
+}
+
+func join(values []string, separator string) string {
+	var line string
+	for i, v := range values {
+		line = line + v
+		if i != len(values)-1 {
+			line = line + separator
+		}
+	}
+	return line
+}
+
 // HandleFunc
 /* This is a Proxy function that assign handler to handle specific route by url but also simultaneously it configures CORS handler.
  * This function is almost equal to mux.Router.HandleFunc except fact that we passing
@@ -98,22 +120,4 @@ func (handler *WebApiHandler) HandleFunc(router *m.Router, path string, f func(h
 		handler.corsConfig[optionRouteName] = append(handler.corsConfig[optionRouteName], handlerMethods...)
 	}
 	return route
-}
-
-func (handler *WebApiHandler) handlePreflightReq(respWriter http.ResponseWriter, request *http.Request) {
-	optionRouteName := stringFormatter.Format("{0}_{1}", request.URL.Path, optionsRouteSuffix)
-	methods := handler.corsConfig[optionRouteName]
-	methodsStr := join(methods, ",")
-	EnableCors(&respWriter, handler.Origin, methodsStr)
-}
-
-func join(values []string, separator string) string {
-	var line string
-	for i, v := range values {
-		line = line + v
-		if i != len(values)-1 {
-			line = line + separator
-		}
-	}
-	return line
 }
