@@ -63,10 +63,15 @@ func EnableCorsAllOrigin(respWriter *http.ResponseWriter) {
  * Returns nothing
  */
 func EnableCors(respWriter *http.ResponseWriter, origin string, methods string) {
-	(*respWriter).Header().Set(AccessControlAllowHeadersHeader, AllowAllHeaderValues)
-	(*respWriter).Header().Set(AccessControlAllowOriginHeader, origin)
+	addCorsHeaders(respWriter, origin)
 	(*respWriter).Header().Set(AccessControlAllowMethodsHeader, methods)
 }
+
+func addCorsHeaders(respWriter *http.ResponseWriter, origin string) {
+	(*respWriter).Header().Set(AccessControlAllowHeadersHeader, AllowAllHeaderValues)
+	(*respWriter).Header().Set(AccessControlAllowOriginHeader, origin)
+}
+
 
 func (handler *WebApiHandler) handlePreflightReq(respWriter http.ResponseWriter, request *http.Request) {
 	route := m.CurrentRoute(request)
@@ -90,6 +95,17 @@ func join(values []string, separator string) string {
 	return line
 }
 
+
+// handleWithCors function that adds CORS headers before handler func is called
+func (handler *WebApiHandler) handleWithCors(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		if handler.AllowCors {
+			addCorsHeaders(&writer, handler.Origin)
+		}
+		f(writer, request)
+	}
+}
+
 // HandleFunc
 /* This is a Proxy function that assign handler to handle specific route by url but also simultaneously it configures CORS handler.
  * This function is almost equal to mux.Router.HandleFunc except fact that we passing
@@ -105,7 +121,7 @@ func join(values []string, separator string) string {
  */
 func (handler *WebApiHandler) HandleFunc(router *m.Router, path string, f func(http.ResponseWriter, *http.Request), handlerMethods ...string) *m.Route {
 	// 1. Create Route ...
-	route := router.HandleFunc(path, f).Methods(handlerMethods...)
+	route := router.HandleFunc(path, handler.handleWithCors(f)).Methods(handlerMethods...)
 	if handler.AllowCors {
 		// 2. Create Options route
 		optionRouteName := stringFormatter.Format("{0}_{1}", path, optionsRouteSuffix)
@@ -121,3 +137,4 @@ func (handler *WebApiHandler) HandleFunc(router *m.Router, path string, f func(h
 	}
 	return route
 }
+
