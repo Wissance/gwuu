@@ -59,14 +59,16 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
  *    - dbName - database/catalog/schema name
  *    - dbUser - user that is using for perform operations on dbName
  *    - password - dbUser password
- *    - create - if true we should create database if it does not exists
+ *    - create - if true we should create database if it does not exist
+ *    - check - if true existence of database is checking otherwise not (we sure that this is a random database and to save
+ *              some time we could omit existence check)
  *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
  * Returns gorm.DB address of database context object
  */
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
-	        useSsl string, create bool, options *g.Config) *g.DB {
+	        useSsl string, create bool, check bool, options *g.Config) *g.DB {
     connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
-    return OpenDb2(dialect, connStr, create, options)
+    return OpenDb2(dialect, connStr, create, check, options)
 }
 
 // OpenDb2
@@ -76,10 +78,12 @@ func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser str
  * Parameters:
  *    - dialect - string that represent using db driver inside gorm (see enum above)
  *    - connStr - full connection string
- *    - create - if true we should create database if it does not exists
+ *    - create - if true we should create database if it does not exist
+ *    - check - if true existence of database is checking otherwise not (we sure that this is a random database and to save
+ *              some time we could omit existence check)
  *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
  */
-func OpenDb2(dialect SqlDialect, connStr string, create bool, options *g.Config) *g.DB {
+func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, options *g.Config) *g.DB {
 	dbCheckResult := CheckDb(dialect, connStr)
 	if create == false {
 		if dbCheckResult == false {
