@@ -39,9 +39,17 @@ func TestHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 
 	checkOptionRouteCors(t, handler.Router, realmResource, AnyOrigin, "*", "OPTIONS,GET" )
 	checkOptionRouteCors(t, handler.Router, userResourceRoot, AnyOrigin, "*", "OPTIONS,GET,POST" )
+	checkRouteCors(t, handler.Router, "GET", realmResource,  AnyOrigin)
+
+	checkRouteCors(t, handler.Router, "GET", userResourceRoot,  AnyOrigin)
+	checkRouteCors(t, handler.Router, "POST", userResourceRoot,  AnyOrigin)
 
         userById := "/api/user/123/"
 	checkOptionRouteCors(t, handler.Router, userById, AnyOrigin, "*", "OPTIONS,GET,PUT,DELETE" )
+
+	checkRouteCors(t, handler.Router, "GET", userById,  AnyOrigin)
+	checkRouteCors(t, handler.Router, "PUT", userById,  AnyOrigin)
+	checkRouteCors(t, handler.Router, "DELETE", userById,  AnyOrigin)
 }
 
 func TestHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
@@ -78,8 +86,17 @@ func TestHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 	checkOptionRouteCors(t, handler.Router, "/service1" + objectResource, internalSubNet, "*", "OPTIONS,GET,POST" )
 	checkOptionRouteCors(t, handler.Router, "/service2" + classRootResource, internalSubNet, "*", "OPTIONS,GET,POST" )
 
+	checkRouteCors(t,handler.Router, "GET", "/service1" + objectResource, internalSubNet)
+	checkRouteCors(t,handler.Router, "POST", "/service1" + objectResource, internalSubNet)
+
+	checkRouteCors(t,handler.Router, "GET", "/service2" + classRootResource, internalSubNet)
+	checkRouteCors(t,handler.Router, "POST", "/service2" + classRootResource, internalSubNet)
+
+
 	classById := "/api/class/356/"
 	checkOptionRouteCors(t, handler.Router, "/service2" + classById, internalSubNet, "*", "OPTIONS,DELETE" )
+
+	checkRouteCors(t,handler.Router, "DELETE", "/service2" + classById, internalSubNet)
 }
 
 func checkOptionRouteCors(t *testing.T, router *mux.Router, requestPath string, allowedOrigin string, allowedHeader string, allowedMethods string) {
@@ -90,4 +107,12 @@ func checkOptionRouteCors(t *testing.T, router *mux.Router, requestPath string, 
 	assert.Equal(t, allowedOrigin, writer.Header().Get(AccessControlAllowOriginHeader))
 	assert.Equal(t, allowedHeader, writer.Header().Get(AccessControlAllowHeadersHeader))
 	assert.Equal(t, allowedMethods, writer.Header().Get(AccessControlAllowMethodsHeader))
+}
+
+func checkRouteCors(t *testing.T, router *mux.Router, method string, requestPath string, allowedOrigin string) {
+	request := http.Request{URL: &url.URL{Scheme: "http", Host: "127.0.0.1:8687", Path: requestPath},
+		Method: method}
+	writer := httptest.NewRecorder()
+	router.ServeHTTP(writer, &request)
+	assert.Equal(t, allowedOrigin, writer.Header().Get(AccessControlAllowOriginHeader))
 }
