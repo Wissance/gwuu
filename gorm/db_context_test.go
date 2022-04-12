@@ -40,21 +40,21 @@ func TestBuildMssqlConnectionString(t *testing.T) {
 
 func TestPostgresOpenSystemDb(t *testing.T) {
 	cfg := gorm.Config{}
-    db := OpenDb(Postgres, "127.0.0.1", 5432, "postgres", dbUser, dbPassword, "disable", false, &cfg)
+    db := OpenDb(Postgres, "127.0.0.1", 5432, "postgres", dbUser, dbPassword, "disable", false, false, &cfg)
     assert.NotNil(t, db)
     CloseDb(db)
 }
 
 func TestMysqlOpenSystemDb(t *testing.T) {
 	cfg := gorm.Config{}
-	db := OpenDb(Mysql, "localhost", 3306, "mysql", dbUser, dbPassword, "", false, &cfg)
+	db := OpenDb(Mysql, "localhost", 3306, "mysql", dbUser, dbPassword, "", false, false, &cfg)
 	assert.NotNil(t, db)
 	CloseDb(db)
 }
 
 func TestMssqlOpenSystemDb(t *testing.T) {
 	cfg := gorm.Config{}
-	db := OpenDb(Mssql, "localhost", 1433, "master", dbUser, dbPassword, "", false, &cfg)
+	db := OpenDb(Mssql, "localhost", 1433, "master", dbUser, dbPassword, "", false, false, &cfg)
 	assert.NotNil(t, db)
 	CloseDb(db)
 }
@@ -132,7 +132,7 @@ func TestCreateMysqlSystemDbConnectionString(t *testing.T) {
 
 // ################################################# internal functions ###############################################
 func testOpenDbWithCreateAndCheck(t *testing.T, connStr string, dialect SqlDialect, options *gorm.Config) {
-	db := OpenDb2(dialect, connStr, true, options)
+	db := OpenDb2(dialect, connStr, true, true, options)
 	assert.NotNil(t, db)
 	// Close
 	CloseDb(db)

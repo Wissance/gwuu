@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"github.com/gofrs/uuid"
 	_ "github.com/jinzhu/gorm/dialects/mssql"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -30,6 +31,8 @@ const postgresSystemDb = "postgres"
 const mssqlSystemDb = "master"
 const mysqlSystemDb = "mysql"
 
+const tmpDatabaseNameTemplate = "wissance_tmp_db_{0}"
+
 // BuildConnectionString
 /* Function that builds connection string from individual parameters to use in OpenDb2
  * Parameters:
@@ -44,6 +47,25 @@ const mysqlSystemDb = "mysql"
  */
 func BuildConnectionString(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string, useSsl string) string {
 	return createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
+}
+
+// CreateRandomDb
+// Function that Create and Open database with random name
+// this function should be used for testing purposes create temporary database for test
+/* Parameters:
+ *    - dialect - string that represent using db driver inside gorm (see enum above)
+ *    - host - ip address / hostname of machine where database server is located
+ *    - port - integer value representing server tcp port (typically 5432 for postgres, 3306 for mysql and 1433 for mssql)
+ *    - dbUser - user that is using for perform operations on dbName
+ *    - password - dbUser password
+ *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
+ * Returns gorm.DB address of database context object
+ */
+func CreateRandomDb(dialect SqlDialect, host string, port int, dbUser string, password string,
+	            useSsl string, options *g.Config) *g.DB {
+	random, _ := uuid.NewV4()
+	dbName := stringFormatter.Format(tmpDatabaseNameTemplate, strings.Replace(random.String(),"-", "", -1))
+	return OpenDb(dialect, host, port, dbName, dbUser, password, useSsl, true, false, options)
 }
 
 // OpenDb
@@ -67,8 +89,8 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
  */
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
 	        useSsl string, create bool, check bool, options *g.Config) *g.DB {
-    connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
-    return OpenDb2(dialect, connStr, create, check, options)
+	connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
+	return OpenDb2(dialect, connStr, create, check, options)
 }
 
 // OpenDb2
