@@ -59,13 +59,14 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
  *    - dbUser - user that is using for perform operations on dbName
  *    - password - dbUser password
  *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
- * Returns gorm.DB address of database context object
+ * Returns tuple og gorm.DB address of database context object and connStr
  */
 func CreateRandomDb(dialect SqlDialect, host string, port int, dbUser string, password string,
-	            useSsl string, options *g.Config) *g.DB {
+	            useSsl string, options *g.Config) (*g.DB, string) {
 	random, _ := uuid.NewV4()
 	dbName := stringFormatter.Format(tmpDatabaseNameTemplate, strings.Replace(random.String(),"-", "", -1))
-	return OpenDb(dialect, host, port, dbName, dbUser, password, useSsl, true, false, options)
+	connStr := BuildConnectionString(dialect, host, port,dbName, dbUser, password, useSsl)
+	return OpenDb2(dialect, connStr, true, false, options), connStr
 }
 
 // OpenDb
