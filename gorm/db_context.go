@@ -108,13 +108,13 @@ func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser str
  */
 func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, options *g.Config) *g.DB {
 	// by default, we set dbCheckResult to true (for case when check is not needed)
-	dbCheckResult := true
+	dbCheckResult := false
 	if check {
 		// we check if check is true
 		dbCheckResult = CheckDb(dialect, connStr)
 	}
 	if create == false {
-		if dbCheckResult == false {
+		if dbCheckResult == false && check == true {
 			return nil
 		}
 	} else {
