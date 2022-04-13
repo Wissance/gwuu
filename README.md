@@ -7,15 +7,15 @@ Contains following tools:
     - create database (Postgres, Mssql, Mysql)
     - drop database  (Postgres, Mssql, Mysql)
     - get next identifier (sometimes GORM is unable to create entities with auto-generated identifiers therefore i have to gen it manually)
-    - get portion of data
+    - get portion of data (data paging)
 
 * testingutils - a set of utils that makes unit testing easily
-* api/rest - a set of extensions for gorilla/mux^
+* api/rest - a set of extensions for `github.comgorilla/mux`
     - easy register HandlerFunc and you'll get auto Preflight handler register too (response on OPTION resource) so that you API automatically support CORS now.
 
 ## 1. Gorm
 As were mentioned above we could make connection to any database (MySql, MsSql or Postgres) with creation specified database before, drop database. This functionality
-is especially useful in unit tests. I.e. (see unit tests for more details)
+is especially useful in unit tests. I.e. see unit tests for more details. There are 
 
 ```go
 func TestPostgresOpenDbWithCreate(t *testing.T) {
@@ -38,7 +38,7 @@ func TestMssqlOpenDbWithCreate(t *testing.T) {
 }
 
 func testOpenDbWithCreateAndCheck(t *testing.T, connStr string, dialect SqlDialect, options *gorm.Config) {
-	db := OpenDb2(dialect, connStr, true, options)
+	db := OpenDb2(dialect, connStr, true, true, options)
 	assert.NotNil(t, db)
 	// Close
 	CloseDb(db)
@@ -49,6 +49,9 @@ func testOpenDbWithCreateAndCheck(t *testing.T, connStr string, dialect SqlDiale
 	assert.Equal(t, false, checkResult)
 }
 ```
+
+We could omit check parameter in that case Open database or Open database with create takes less time.
+We are also could use function `CreateRandomDb` to get new database with random name.
 
 ## 2. Testingutils
 
