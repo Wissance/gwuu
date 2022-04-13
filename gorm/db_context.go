@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"github.com/gofrs/uuid"
 	_ "github.com/jinzhu/gorm/dialects/mssql"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -30,6 +31,8 @@ const postgresSystemDb = "postgres"
 const mssqlSystemDb = "master"
 const mysqlSystemDb = "mysql"
 
+const tmpDatabaseNameTemplate = "wissance_tmp_db_{0}"
+
 // BuildConnectionString
 /* Function that builds connection string from individual parameters to use in OpenDb2
  * Parameters:
@@ -46,6 +49,26 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
 	return createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
 }
 
+// CreateRandomDb
+// Function that Create and Open database with random name
+// this function should be used for testing purposes create temporary database for test
+/* Parameters:
+ *    - dialect - string that represent using db driver inside gorm (see enum above)
+ *    - host - ip address / hostname of machine where database server is located
+ *    - port - integer value representing server tcp port (typically 5432 for postgres, 3306 for mysql and 1433 for mssql)
+ *    - dbUser - user that is using for perform operations on dbName
+ *    - password - dbUser password
+ *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
+ * Returns tuple og gorm.DB address of database context object and connStr
+ */
+func CreateRandomDb(dialect SqlDialect, host string, port int, dbUser string, password string,
+	            useSsl string, options *g.Config) (*g.DB, string) {
+	random, _ := uuid.NewV4()
+	dbName := stringFormatter.Format(tmpDatabaseNameTemplate, strings.Replace(random.String(),"-", "", -1))
+	connStr := BuildConnectionString(dialect, host, port,dbName, dbUser, password, useSsl)
+	return OpenDb2(dialect, connStr, true, false, options), connStr
+}
+
 // OpenDb
 /* Function that Open or Create and Open database
  * If you are using MSSQL Do not forget to switch on TCP connections for sql server, otherwise you wil get following error:
@@ -59,14 +82,16 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
  *    - dbName - database/catalog/schema name
  *    - dbUser - user that is using for perform operations on dbName
  *    - password - dbUser password
- *    - create - if true we should create database if it does not exists
+ *    - create - if true we should create database if it does not exist
+ *    - check - if true existence of database is checking otherwise not (we sure that this is a random database and to save
+ *              some time we could omit existence check)
  *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
  * Returns gorm.DB address of database context object
  */
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
-	        useSsl string, create bool, options *g.Config) *g.DB {
-    connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
-    return OpenDb2(dialect, connStr, create, options)
+	        useSsl string, create bool, check bool, options *g.Config) *g.DB {
+	connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
+	return OpenDb2(dialect, connStr, create, check, options)
 }
 
 // OpenDb2
@@ -76,13 +101,20 @@ func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser str
  * Parameters:
  *    - dialect - string that represent using db driver inside gorm (see enum above)
  *    - connStr - full connection string
- *    - create - if true we should create database if it does not exists
+ *    - create - if true we should create database if it does not exist
+ *    - check - if true existence of database is checking otherwise not (we sure that this is a random database and to save
+ *              some time we could omit existence check)
  *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
  */
-func OpenDb2(dialect SqlDialect, connStr string, create bool, options *g.Config) *g.DB {
-	dbCheckResult := CheckDb(dialect, connStr)
+func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, options *g.Config) *g.DB {
+	// by default, we set dbCheckResult to true (for case when check is not needed)
+	dbCheckResult := false
+	if check {
+		// we check if check is true
+		dbCheckResult = CheckDb(dialect, connStr)
+	}
 	if create == false {
-		if dbCheckResult == false {
+		if dbCheckResult == false && check == true {
 			return nil
 		}
 	} else {

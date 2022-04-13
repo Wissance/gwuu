@@ -16,10 +16,10 @@ const dbPassword = "123"
 // test Build connection string
 
 func TestBuildPostgresConnectionString(t *testing.T) {
-    connStr := BuildConnectionString(Postgres, "localhost", 5432, "custom_app",
+	connStr := BuildConnectionString(Postgres, "localhost", 5432, "custom_app",
     	                             "root", "P@ssW0rd", "disable")
-    expectedConnStr := "host=localhost port=5432 user=root dbname=custom_app password=P@ssW0rd sslmode=disable"
-    assert.Equal(t, expectedConnStr, connStr)
+	expectedConnStr := "host=localhost port=5432 user=root dbname=custom_app password=P@ssW0rd sslmode=disable"
+	assert.Equal(t, expectedConnStr, connStr)
 }
 
 func TestBuildMysqlConnectionString(t *testing.T) {
@@ -40,21 +40,21 @@ func TestBuildMssqlConnectionString(t *testing.T) {
 
 func TestPostgresOpenSystemDb(t *testing.T) {
 	cfg := gorm.Config{}
-    db := OpenDb(Postgres, "127.0.0.1", 5432, "postgres", dbUser, dbPassword, "disable", false, &cfg)
-    assert.NotNil(t, db)
-    CloseDb(db)
+	db := OpenDb(Postgres, "127.0.0.1", 5432, "postgres", dbUser, dbPassword, "disable", false, false, &cfg)
+	assert.NotNil(t, db)
+	CloseDb(db)
 }
 
 func TestMysqlOpenSystemDb(t *testing.T) {
 	cfg := gorm.Config{}
-	db := OpenDb(Mysql, "localhost", 3306, "mysql", dbUser, dbPassword, "", false, &cfg)
+	db := OpenDb(Mysql, "localhost", 3306, "mysql", dbUser, dbPassword, "", false, false, &cfg)
 	assert.NotNil(t, db)
 	CloseDb(db)
 }
 
 func TestMssqlOpenSystemDb(t *testing.T) {
 	cfg := gorm.Config{}
-	db := OpenDb(Mssql, "localhost", 1433, "master", dbUser, dbPassword, "", false, &cfg)
+	db := OpenDb(Mssql, "localhost", 1433, "master", dbUser, dbPassword, "", false, false, &cfg)
 	assert.NotNil(t, db)
 	CloseDb(db)
 }
@@ -79,18 +79,28 @@ func TestMssqlOpenDbWithCreate(t *testing.T) {
 	testOpenDbWithCreateAndCheck(t, connStr, Mssql, &cfg)
 }
 
+func TestCreateRandomDb(t *testing.T) {
+	cfg := gorm.Config{}
+	db, connStr := CreateRandomDb(Postgres, "127.0.0.1", 5432, dbUser, dbPassword, "disable", &cfg)
+	assert.NotNil(t, db)
+	assert.NotEmpty(t, connStr)
+	check := CheckDb(Postgres, connStr)
+	assert.True(t, check)
+	DropDb(Postgres, connStr)
+}
+
 // ####################################################################################################################
 
 // ########################################### private functions tests ################################################
 
 func TestCreatePostgresSystemDbConnectionString(t *testing.T) {
-    connStr := "host=localhost port=5432 user=root dbname=custom_app password=P@ssW0rd sslmode=disable"
-    expectedSystemConnStr := "host=localhost port=5432 user=root dbname=postgres password=P@ssW0rd sslmode=disable"
-    actualSystemConnStr, dbName := createSystemDbConnStr(Postgres, &connStr)
-    assert.Equal(t, expectedSystemConnStr, actualSystemConnStr)
-    assert.Equal(t, "custom_app", dbName)
+	connStr := "host=localhost port=5432 user=root dbname=custom_app password=P@ssW0rd sslmode=disable"
+	expectedSystemConnStr := "host=localhost port=5432 user=root dbname=postgres password=P@ssW0rd sslmode=disable"
+	actualSystemConnStr, dbName := createSystemDbConnStr(Postgres, &connStr)
+	assert.Equal(t, expectedSystemConnStr, actualSystemConnStr)
+	assert.Equal(t, "custom_app", dbName)
 
-    // test when db name like hostname
+	// test when db name like hostname
 	connStr = "host=mysuperapp.com port=5432 user=mysuperapp dbname=mysuperapp password=123456 sslmode=disable"
 	expectedSystemConnStr = "host=mysuperapp.com port=5432 user=mysuperapp dbname=postgres password=123456 sslmode=disable"
 	actualSystemConnStr, dbName = createSystemDbConnStr(Postgres, &connStr)
@@ -132,7 +142,7 @@ func TestCreateMysqlSystemDbConnectionString(t *testing.T) {
 
 // ################################################# internal functions ###############################################
 func testOpenDbWithCreateAndCheck(t *testing.T, connStr string, dialect SqlDialect, options *gorm.Config) {
-	db := OpenDb2(dialect, connStr, true, options)
+	db := OpenDb2(dialect, connStr, true, true, options)
 	assert.NotNil(t, db)
 	// Close
 	CloseDb(db)

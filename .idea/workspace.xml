@@ -63,6 +63,16 @@
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/api/rest/gorilla_cors_test.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../../go/src/runtime/panic.go" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../../../../go/src/net/http/request.go" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/go/pkg/mod/github.com/gorilla/mux@v1.8.0/mux.go" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../../../../go/src/testing/testing.go" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/api/rest/gorilla_cors.go" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/go/pkg/mod/github.com/gorilla/mux@v1.8.0/route.go" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../../../../go/src/net/url/url.go" root0="SKIP_INSPECTION" />
+  </component>
   <component name="ProjectId" id="1pHXWC6FtXeuYTyQmchaznhFjnv" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -85,16 +95,48 @@
       <recent name="C:\Users\mushakov\projects\gwuu\api\rest" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestHandleFuncWithCorsWithAnyOrigin in github.com/wissance/gwuu/api/rest">
-    <configuration name="TestCheckStringsSuccessfulWithoutOrder in github.com/wissance/gwuu/testingutils" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.go test gwuu/gorm">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="gwuu" />
-      <working_directory value="$PROJECT_DIR$/testingutils" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/wissance/gwuu" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestCreateRandomDb in github.com/wissance/gwuu/gorm" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="gwuu" />
+      <working_directory value="$PROJECT_DIR$/gorm" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="github.com/wissance/gwuu/testingutils" />
+      <package value="github.com/wissance/gwuu/gorm" />
       <directory value="$PROJECT_DIR$/gorm" />
       <framework value="gotest" />
-      <pattern value="^\QTestCheckStringsSuccessfulWithoutOrder\E$" />
+      <pattern value="^\QTestCreateRandomDb\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestHandleFuncForSubRouterAndSpecificOrigin in github.com/wissance/gwuu/api/rest" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="gwuu" />
+      <working_directory value="$PROJECT_DIR$/api/rest" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/wissance/gwuu/api/rest" />
+      <directory value="$PROJECT_DIR$/api/rest" />
+      <output_directory value="$PROJECT_DIR$/api/rest" />
+      <framework value="gotest" />
+      <pattern value="^\QTestHandleFuncForSubRouterAndSpecificOrigin\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestHandleFuncWithCorsWithAnyOrigin in github.com/wissance/gwuu/api/rest (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="gwuu" />
+      <working_directory value="$PROJECT_DIR$/api/rest" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/wissance/gwuu/api/rest" />
+      <directory value="$PROJECT_DIR$/gorm" />
+      <framework value="gotest" />
+      <pattern value="^\QTestHandleFuncWithCorsWithAnyOrigin\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestHandleFuncWithCorsWithAnyOrigin in github.com/wissance/gwuu/api/rest" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -108,44 +150,15 @@
       <pattern value="^\QTestHandleFuncWithCorsWithAnyOrigin\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestMssqlOpenSystemDb in db_context_test.go db_context.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestPostgresOpenSystemDb in github.com/wissance/gwuu/gorm" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="gwuu" />
       <working_directory value="$PROJECT_DIR$/gorm" />
-      <kind value="FILE" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/wissance/gwuu/gorm" />
       <directory value="$PROJECT_DIR$/gorm" />
-      <filePath value="$PROJECT_DIR$/gorm/db_context_test.go|$PROJECT_DIR$/gorm/db_context.go" />
       <framework value="gotest" />
-      <pattern value="^TestMssqlOpenSystemDb$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestMssqlOpenSystemDb in db_context_test.go db_context.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="gwuu" />
-      <working_directory value="$PROJECT_DIR$/gorm" />
-      <framework value="gotest" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$/gorm" />
-      <filePath value="$PROJECT_DIR$/gorm/db_context_test.go|C:/Users/mushakov/projects/gwuu/gorm/db_context.go" />
-      <pattern value="^TestMssqlOpenSystemDb$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestMssqlOpenSystemDb in db_context_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="gwuu" />
-      <working_directory value="$PROJECT_DIR$/gorm" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$/gorm" />
-      <filePath value="$PROJECT_DIR$/gorm/db_context_test.go" />
-      <framework value="gotest" />
-      <pattern value="^TestMssqlOpenSystemDb$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestMysqlOpenSystemDb in db_context_test.go db_context.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="gwuu" />
-      <working_directory value="$PROJECT_DIR$/gorm" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$/gorm" />
-      <filePath value="$PROJECT_DIR$/gorm/db_context_test.go|$PROJECT_DIR$/gorm/db_context.go" />
-      <framework value="gotest" />
-      <pattern value="^TestMysqlOpenSystemDb$" />
+      <pattern value="^\QTestPostgresOpenSystemDb\E$" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
@@ -189,19 +202,19 @@
       <item itemvalue="Go Test.go test gorm" />
       <item itemvalue="Go Test.go test gwuu/gorm" />
       <item itemvalue="Go Test.go test rest" />
-      <item itemvalue="Go Test.TestCheckStringsSuccessfulWithoutOrder in github.com/wissance/gwuu/testingutils" />
-      <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go db_context.go" />
-      <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go" />
-      <item itemvalue="Go Test.TestMysqlOpenSystemDb in db_context_test.go db_context.go" />
+      <item itemvalue="Go Test.TestHandleFuncForSubRouterAndSpecificOrigin in github.com/wissance/gwuu/api/rest" />
+      <item itemvalue="Go Test.TestHandleFuncWithCorsWithAnyOrigin in github.com/wissance/gwuu/api/rest (1)" />
       <item itemvalue="Go Test.TestHandleFuncWithCorsWithAnyOrigin in github.com/wissance/gwuu/api/rest" />
+      <item itemvalue="Go Test.TestCreateRandomDb in github.com/wissance/gwuu/gorm" />
+      <item itemvalue="Go Test.TestPostgresOpenSystemDb in github.com/wissance/gwuu/gorm" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestPostgresOpenSystemDb in github.com/wissance/gwuu/gorm" />
+        <item itemvalue="Go Test.TestCreateRandomDb in github.com/wissance/gwuu/gorm" />
+        <item itemvalue="Go Test.TestHandleFuncForSubRouterAndSpecificOrigin in github.com/wissance/gwuu/api/rest" />
+        <item itemvalue="Go Test.TestHandleFuncWithCorsWithAnyOrigin in github.com/wissance/gwuu/api/rest (1)" />
         <item itemvalue="Go Test.TestHandleFuncWithCorsWithAnyOrigin in github.com/wissance/gwuu/api/rest" />
-        <item itemvalue="Go Test.TestCheckStringsSuccessfulWithoutOrder in github.com/wissance/gwuu/testingutils" />
-        <item itemvalue="Go Test.TestMysqlOpenSystemDb in db_context_test.go db_context.go" />
-        <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go db_context.go" />
-        <item itemvalue="Go Test.TestMssqlOpenSystemDb in db_context_test.go" />
       </list>
     </recent_temporary>
   </component>
@@ -229,18 +242,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/gorm/db_context.go</url>
-          <line>47</line>
+          <line>70</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/gorm/db_context.go</url>
-          <line>68</line>
+          <line>92</line>
           <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/gorm/db_context_test.go</url>
-          <line>44</line>
-          <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/gorm/db_transactions_test.go</url>
@@ -253,9 +261,44 @@
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/api/rest/gorilla_cors.go</url>
+          <line>78</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/api/rest/gorilla_cors.go</url>
+          <line>76</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/api/rest/gorilla_cors_test.go</url>
-          <line>41</line>
-          <option name="timeStamp" value="10" />
+          <line>105</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/api/rest/gorilla_cors_test.go</url>
+          <line>102</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/api/rest/gorilla_cors_test.go</url>
+          <line>106</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/api/rest/gorilla_cors_test.go</url>
+          <line>85</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/gorm/db_context_test.go</url>
+          <line>83</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/gorm/db_context_test.go</url>
+          <line>42</line>
+          <option name="timeStamp" value="31" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
