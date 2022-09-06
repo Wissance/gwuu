@@ -9,9 +9,13 @@ import (
 
 const (
 	ExpectedOrActualBothNotNil = "One of arrays (expected, actual) is nil other is not nil"
-	ArraysLengthAreNotSame = "Arrays length are not same"
-	ItemNotFound = "Expected array item: \"{0}\" at index: \"{1}\" was not found in actual array"
+	ArraysLengthAreNotSame     = "Arrays length are not same"
+	ItemNotFound               = "Expected array item: \"{0}\" at index: \"{1}\" was not found in actual array"
 )
+
+type Numeric interface {
+	int | int32 | uint32 | int64 | uint64
+}
 
 // CheckStrings
 /*  This function allow us to compare two arrays of Strings with order and without it and with asserts (assertErr is true) and without order
@@ -24,9 +28,9 @@ const (
  *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
  *  Functions return nothing and asserts if arrays are not equals
  *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
- */
+*/
 func CheckStrings(t *testing.T, expected []string, actual []string, checkOrder bool, assertErr bool) (bool, string) {
-	if expected == nil || actual == nil{
+	if expected == nil || actual == nil {
 		nilArraysCheck := expected == nil && actual == nil
 		if assertErr {
 			assert.Nil(t, expected, "Checking that expected is nil")
@@ -77,8 +81,8 @@ func CheckStrings(t *testing.T, expected []string, actual []string, checkOrder b
 	return true, ""
 }
 
-// CheckIntegers
-/*  This function allow us to compare two arrays of int's with order and without it
+// CheckNumeric
+/*  This function allow us to compare two arrays of fixed point values with order and without it
 *   This function could work without assert (see assertErr param)
  *  Parameters:
  *     - t is Test State, because we provide functions to check equality in tests
@@ -88,201 +92,9 @@ func CheckStrings(t *testing.T, expected []string, actual []string, checkOrder b
  *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
  *  Functions return nothing and asserts if arrays are not equals
  *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
- */
-func CheckIntegers(t *testing.T, expected []int, actual []int, checkOrder bool, assertErr bool) (bool, string) {
-	if expected == nil || actual == nil{
-		nilArraysCheck := expected == nil && actual == nil
-		if assertErr {
-			assert.Nil(t, expected, "Checking that expected is nil")
-			assert.Nil(t, actual, "Checking that actual is nil")
-		}
-		if nilArraysCheck {
-			return true, ""
-		}
-		return false, ExpectedOrActualBothNotNil
-	}
-	if len(expected) != len(actual) {
-		if assertErr {
-			assert.Equal(t, len(expected), len(actual), "Checking that arrays length are equals")
-		}
-		return false, ArraysLengthAreNotSame
-	}
-
-	itemCheck := true
-	// created empty array that will be populated if we found items
-	usedObjects := make([]int, 0)
-	for i, eItem := range expected {
-		if checkOrder {
-			itemCheck = itemCheck && (expected[i] == actual[i])
-			if assertErr {
-				assert.Equal(t, expected[i], actual[i])
-			}
-		} else {
-			unOrderedCheck := false
-			for j, aItem := range actual {
-				// if j (index) already contains
-				if !contains(usedObjects, j) {
-					if eItem == aItem {
-						unOrderedCheck = true
-						usedObjects = append(usedObjects, j)
-						break
-					}
-				}
-			}
-			itemCheck = itemCheck && unOrderedCheck
-			if assertErr {
-				assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object \"{0}\" exists in actual array", eItem))
-			}
-		}
-		if !itemCheck {
-			return false, stringFormatter.Format(ItemNotFound, eItem, i)
-		}
-	}
-	return true, ""
-}
-
-// CheckIntegers64
-/*  This function allow us to check two arrays of int64 with order and without it
-*   This function could work without assert (see assertErr param)
- *  Parameters:
- *     - t is Test State, because we provide functions to check equality in tests
- *     - expected - one array of int64
- *     - actual - another array of int64
- *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
- *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
- *  Functions return nothing and asserts if arrays are not equals
- *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
- */
-func CheckIntegers64(t *testing.T, expected []int64, actual []int64, checkOrder bool, assertErr bool) (bool, string) {
-	if expected == nil || actual == nil{
-		nilArraysCheck := expected == nil && actual == nil
-		if assertErr {
-			assert.Nil(t, expected, "Checking that expected is nil")
-			assert.Nil(t, actual, "Checking that actual is nil")
-		}
-		if nilArraysCheck {
-			return true, ""
-		}
-		return false, ExpectedOrActualBothNotNil
-	}
-	if len(expected) != len(actual) {
-		if assertErr {
-			assert.Equal(t, len(expected), len(actual), "Checking that arrays length are equals")
-		}
-		return false, ArraysLengthAreNotSame
-	}
-
-	itemCheck := true
-	// created empty array that will be populated if we found items
-	usedObjects := make([]int, 0)
-	for i, eItem := range expected {
-		if checkOrder {
-			itemCheck = itemCheck && (expected[i] == actual[i])
-			if assertErr {
-				assert.Equal(t, expected[i], actual[i])
-			}
-		} else {
-			unOrderedCheck := false
-			for j, aItem := range actual {
-				// if j (index) already contains
-				if !contains(usedObjects, j) {
-					if eItem == aItem {
-						unOrderedCheck = true
-						usedObjects = append(usedObjects, j)
-						break
-					}
-				}
-			}
-			itemCheck = itemCheck && unOrderedCheck
-			if assertErr {
-				assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object \"{0}\" exists in actual array", eItem))
-			}
-		}
-		if !itemCheck {
-			return false, stringFormatter.Format(ItemNotFound, eItem, i)
-		}
-	}
-	return true, ""
-}
-
-// CheckUnsignedIntegers
-/*  This function allow us to compare two arrays of uint with order and without it
-*   This function could work without assert (see assertErr param)
- *  Parameters:
- *     - t is Test State, because we provide functions to check equality in tests
- *     - expected - one array of uint
- *     - actual - another array of uint
- *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
- *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
- *  Functions return nothing and asserts if arrays are not equals
- *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
- */
-func CheckUnsignedIntegers(t *testing.T, expected []uint, actual []uint, checkOrder bool, assertErr bool) (bool, string) {
-	if expected == nil || actual == nil{
-		nilArraysCheck := expected == nil && actual == nil
-		if assertErr {
-			assert.Nil(t, expected, "Checking that expected is nil")
-			assert.Nil(t, actual, "Checking that actual is nil")
-		}
-		if nilArraysCheck {
-			return true, ""
-		}
-		return false, ExpectedOrActualBothNotNil
-	}
-	if len(expected) != len(actual) {
-		if assertErr {
-			assert.Equal(t, len(expected), len(actual), "Checking that arrays length are equals")
-		}
-		return false, ArraysLengthAreNotSame
-	}
-
-	itemCheck := true
-	// created empty array that will be populated if we found items
-	usedObjects := make([]int, 0)
-	for i, eItem := range expected {
-		if checkOrder {
-			itemCheck = itemCheck && (expected[i] == actual[i])
-			if assertErr {
-				assert.Equal(t, expected[i], actual[i])
-			}
-		} else {
-			unOrderedCheck := false
-			for j, aItem := range actual {
-				// if j (index) already contains
-				if !contains(usedObjects, j) {
-					if eItem == aItem {
-						unOrderedCheck = true
-						usedObjects = append(usedObjects, j)
-						break
-					}
-				}
-			}
-			itemCheck = itemCheck && unOrderedCheck
-			if assertErr {
-				assert.True(t, unOrderedCheck, stringFormatter.Format("Checking object \"{0}\" exists in actual array", eItem))
-			}
-		}
-		if !itemCheck {
-			return false, stringFormatter.Format(ItemNotFound, eItem, i)
-		}
-	}
-	return true, ""
-}
-
-// CheckUnsignedIntegers64
-/*  This function allow us to compare two arrays of uint64 with order and without it
-*   This function could work without assert (see assertErr param)
- *  Parameters:
- *     - t is Test State, because we provide functions to check equality in tests
- *     - expected - one array of uint64
- *     - actual - another array of uint64
- *     - checkOrder - parameter that is responsible for check data with respect to order of arrays items
- *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
- *  Functions return nothing and asserts if arrays are not equals
- *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
- */
-func CheckUnsignedIntegers64(t *testing.T, expected []uint64, actual []uint64, checkOrder bool, assertErr bool) (bool, string) {
-	if expected == nil || actual == nil{
+*/
+func CheckNumeric[T Numeric](t *testing.T, expected []T, actual []T, checkOrder bool, assertErr bool) (bool, string) {
+	if expected == nil || actual == nil {
 		nilArraysCheck := expected == nil && actual == nil
 		if assertErr {
 			assert.Nil(t, expected, "Checking that expected is nil")
@@ -345,9 +157,9 @@ func CheckUnsignedIntegers64(t *testing.T, expected []uint64, actual []uint64, c
  *     - assertErr - assert if True otherwise just use a result to check whether error occurred or not
  *  Functions return nothing and asserts if arrays are not equals
  *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
- */
+*/
 func CheckFloats(t *testing.T, expected []float32, actual []float32, tolerance float64, checkOrder bool, assertErr bool) (bool, string) {
-	if expected == nil || actual == nil{
+	if expected == nil || actual == nil {
 		nilArraysCheck := expected == nil && actual == nil
 		if assertErr {
 			assert.Nil(t, expected, "Checking that expected is nil")
@@ -370,7 +182,7 @@ func CheckFloats(t *testing.T, expected []float32, actual []float32, tolerance f
 	usedObjects := make([]int, 0)
 	for i, eItem := range expected {
 		if checkOrder {
-			comparisonResult := math.Abs(float64(expected[i] - actual[i])) < tolerance
+			comparisonResult := math.Abs(float64(expected[i]-actual[i])) < tolerance
 			itemCheck = itemCheck && comparisonResult
 			if assertErr {
 				assert.True(t, comparisonResult)
@@ -380,7 +192,7 @@ func CheckFloats(t *testing.T, expected []float32, actual []float32, tolerance f
 			for j, aItem := range actual {
 				// if j (index) already contains
 				if !contains(usedObjects, j) {
-					comparisonResult := math.Abs(float64(eItem - aItem)) < tolerance
+					comparisonResult := math.Abs(float64(eItem-aItem)) < tolerance
 					if comparisonResult {
 						unOrderedCheck = true
 						usedObjects = append(usedObjects, j)
@@ -413,8 +225,8 @@ func CheckFloats(t *testing.T, expected []float32, actual []float32, tolerance f
  *  Functions return nothing and asserts if arrays are not equals
  *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
 */
-func CheckFloats64(t *testing.T, expected []float64, actual []float64, tolerance float64, checkOrder bool, assertErr bool) (bool, string)  {
-	if expected == nil || actual == nil{
+func CheckFloats64(t *testing.T, expected []float64, actual []float64, tolerance float64, checkOrder bool, assertErr bool) (bool, string) {
+	if expected == nil || actual == nil {
 		nilArraysCheck := expected == nil && actual == nil
 		if assertErr {
 			assert.Nil(t, expected, "Checking that expected is nil")
@@ -437,7 +249,7 @@ func CheckFloats64(t *testing.T, expected []float64, actual []float64, tolerance
 	usedObjects := make([]int, 0)
 	for i, eItem := range expected {
 		if checkOrder {
-			comparisonResult := math.Abs(expected[i] - actual[i]) < tolerance
+			comparisonResult := math.Abs(expected[i]-actual[i]) < tolerance
 			itemCheck = itemCheck && comparisonResult
 			if assertErr {
 				assert.True(t, comparisonResult)
@@ -447,7 +259,7 @@ func CheckFloats64(t *testing.T, expected []float64, actual []float64, tolerance
 			for j, aItem := range actual {
 				// if j (index) already contains
 				if !contains(usedObjects, j) {
-					comparisonResult := math.Abs(eItem - aItem) < tolerance
+					comparisonResult := math.Abs(eItem-aItem) < tolerance
 					if comparisonResult {
 						unOrderedCheck = true
 						usedObjects = append(usedObjects, j)
@@ -481,8 +293,8 @@ func CheckFloats64(t *testing.T, expected []float64, actual []float64, tolerance
  *  Functions return nothing and asserts if arrays are not equals
  *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
 */
-func CheckComplexes(t *testing.T, expected []complex64, actual []complex64, tolerance float64, checkOrder bool, assertErr bool) (bool, string)  {
-	if expected == nil || actual == nil{
+func CheckComplexes(t *testing.T, expected []complex64, actual []complex64, tolerance float64, checkOrder bool, assertErr bool) (bool, string) {
+	if expected == nil || actual == nil {
 		nilArraysCheck := expected == nil && actual == nil
 		if assertErr {
 			assert.Nil(t, expected, "Checking that expected is nil")
@@ -505,8 +317,8 @@ func CheckComplexes(t *testing.T, expected []complex64, actual []complex64, tole
 	usedObjects := make([]int, 0)
 	for i, eItem := range expected {
 		if checkOrder {
-			comparisonResult := math.Abs(float64(real(expected[i]) - real(actual[i]))) < tolerance &&
-				math.Abs(float64(imag(expected[i]) - imag(actual[i]))) < tolerance
+			comparisonResult := math.Abs(float64(real(expected[i])-real(actual[i]))) < tolerance &&
+				math.Abs(float64(imag(expected[i])-imag(actual[i]))) < tolerance
 			itemCheck = itemCheck && comparisonResult
 			if assertErr {
 				assert.True(t, comparisonResult)
@@ -516,8 +328,8 @@ func CheckComplexes(t *testing.T, expected []complex64, actual []complex64, tole
 			for j, aItem := range actual {
 				// if j (index) already contains
 				if !contains(usedObjects, j) {
-					comparisonResult := math.Abs(float64(real(eItem) - real(aItem))) < tolerance &&
-						            math.Abs(float64(imag(eItem) - imag(aItem))) < tolerance
+					comparisonResult := math.Abs(float64(real(eItem)-real(aItem))) < tolerance &&
+						math.Abs(float64(imag(eItem)-imag(aItem))) < tolerance
 					if comparisonResult {
 						unOrderedCheck = true
 						usedObjects = append(usedObjects, j)
@@ -551,8 +363,8 @@ func CheckComplexes(t *testing.T, expected []complex64, actual []complex64, tole
  *  Functions return nothing and asserts if arrays are not equals
  *  Returns (true, empty str) if there is no assert fail, otherwise - false + reason
 */
-func CheckComplexes128(t *testing.T, expected []complex128, actual []complex128, tolerance float64, checkOrder bool, assertErr bool) (bool, string)  {
-	if expected == nil || actual == nil{
+func CheckComplexes128(t *testing.T, expected []complex128, actual []complex128, tolerance float64, checkOrder bool, assertErr bool) (bool, string) {
+	if expected == nil || actual == nil {
 		nilArraysCheck := expected == nil && actual == nil
 		if assertErr {
 			assert.Nil(t, expected, "Checking that expected is nil")
@@ -575,8 +387,8 @@ func CheckComplexes128(t *testing.T, expected []complex128, actual []complex128,
 	usedObjects := make([]int, 0)
 	for i, eItem := range expected {
 		if checkOrder {
-			comparisonResult := math.Abs(real(expected[i]) - real(actual[i])) < tolerance &&
-				math.Abs(imag(expected[i]) - imag(actual[i])) < tolerance
+			comparisonResult := math.Abs(real(expected[i])-real(actual[i])) < tolerance &&
+				math.Abs(imag(expected[i])-imag(actual[i])) < tolerance
 			itemCheck = itemCheck && comparisonResult
 			if assertErr {
 				assert.True(t, comparisonResult)
@@ -586,8 +398,8 @@ func CheckComplexes128(t *testing.T, expected []complex128, actual []complex128,
 			for j, aItem := range actual {
 				// if j (index) already contains
 				if !contains(usedObjects, j) {
-					comparisonResult := math.Abs(real(eItem) - real(aItem)) < tolerance &&
-						math.Abs(imag(eItem) - imag(aItem)) < tolerance
+					comparisonResult := math.Abs(real(eItem)-real(aItem)) < tolerance &&
+						math.Abs(imag(eItem)-imag(aItem)) < tolerance
 					if comparisonResult {
 						unOrderedCheck = true
 						usedObjects = append(usedObjects, j)

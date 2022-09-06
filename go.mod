@@ -1,6 +1,6 @@
 module github.com/wissance/gwuu
 
-go 1.16
+go 1.18
 
 require (
 	github.com/gofrs/uuid v3.2.0+incompatible

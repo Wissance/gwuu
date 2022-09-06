@@ -72,7 +72,7 @@ func TestCheckIntegersSuccessfulWithoutOrder(t *testing.T) {
 	arr2[1] = 0
 	arr2[2] = 0
 
-	checkResult, err := CheckIntegers(t, arr1, arr2, false, true)
+	checkResult, err := CheckNumeric[int](t, arr1, arr2, false, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 
@@ -89,24 +89,24 @@ func TestCheckIntegersFailsWithoutOrder(t *testing.T) {
 	arr2[1] = 0
 	arr2[2] = 0
 
-	checkResult, err := CheckIntegers(t, arr1, arr2, false, false)
+	checkResult, err := CheckNumeric[int](t, arr1, arr2, false, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 
 }
 
 func TestCheckIntegersSuccessfulWithOrder(t *testing.T) {
-	arr1 := make([]int, 3)
+	arr1 := make([]int64, 3)
 	arr1[0] = 111
 	arr1[2] = 333
 	arr1[1] = 222
 
-	arr2 := make([]int, 3)
+	arr2 := make([]int64, 3)
 	arr2[0] = 111
 	arr2[1] = 222
 	arr2[2] = 333
 
-	checkResult, err := CheckIntegers(t, arr1, arr2, true, true)
+	checkResult, err := CheckNumeric[int64](t, arr1, arr2, true, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 }
@@ -122,25 +122,25 @@ func TestCheckIntegersFailsWithOrder(t *testing.T) {
 	arr2[1] = 222
 	arr2[2] = 333
 
-	checkResult, err := CheckIntegers(t, arr1, arr2, true, false)
+	checkResult, err := CheckNumeric[int](t, arr1, arr2, true, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
 
 func TestCheckFloat32SuccessfulWithOrder(t *testing.T) {
-    arr1 := make([]float32, 3)
-    arr1[0] = 10.55
-    arr1[1] = 99
-    arr1[2] = 55.9
+	arr1 := make([]float32, 3)
+	arr1[0] = 10.55
+	arr1[1] = 99
+	arr1[2] = 55.9
 
-    arr2 := make([]float32, 3)
-    arr2[0] = 11.01
-    arr2[1] = 99
-    arr2[2] = 55.6
+	arr2 := make([]float32, 3)
+	arr2[0] = 11.01
+	arr2[1] = 99
+	arr2[2] = 55.6
 
-    checkResult, err := CheckFloats(t, arr1, arr2, 0.5, true, true)
-    assert.True(t, checkResult)
-    assert.Empty(t, err)
+	checkResult, err := CheckFloats(t, arr1, arr2, 0.5, true, true)
+	assert.True(t, checkResult)
+	assert.Empty(t, err)
 }
 
 func TestCheckFloat32FailsWithOrder(t *testing.T) {
