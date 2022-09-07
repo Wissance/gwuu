@@ -112,17 +112,17 @@ func TestCheckIntegersSuccessfulWithOrder(t *testing.T) {
 }
 
 func TestCheckIntegersFailsWithOrder(t *testing.T) {
-	arr1 := make([]int, 3)
+	arr1 := make([]uint, 3)
 	arr1[0] = 111
 	arr1[2] = 3334
 	arr1[1] = 222
 
-	arr2 := make([]int, 3)
+	arr2 := make([]uint, 3)
 	arr2[0] = 111
 	arr2[1] = 222
 	arr2[2] = 333
 
-	checkResult, err := CheckNumeric[int](t, arr1, arr2, true, false)
+	checkResult, err := CheckNumeric[uint](t, arr1, arr2, true, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }

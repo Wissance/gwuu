@@ -14,7 +14,7 @@ const (
 )
 
 type Numeric interface {
-	int | int32 | uint32 | int64 | uint64
+	int | uint | int32 | uint32 | int64 | uint64
 }
 
 // CheckStrings
