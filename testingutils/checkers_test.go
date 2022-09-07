@@ -314,7 +314,7 @@ func TestCheckComplex64FailsWithoutOrder(t *testing.T) {
 	arr2[1] = complex(99, 100.91)
 	arr2[2] = complex(55.6, 66.88)
 
-	checkResult, err := CheckComplexes(t, arr1, arr2, 0.5, false, false)
+	checkResult, err := CheckComplexes[complex64](t, arr1, arr2, 0.5, false, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
