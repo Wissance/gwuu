@@ -17,14 +17,15 @@ import (
 type SqlDialect string
 
 const (
-    Postgres SqlDialect = "postgres"
-    Mysql = "mysql"
-    Mssql = "mssql"
-    Sqlite = "sqlite"
+	Postgres SqlDialect = "postgres"
+	Mysql               = "mysql"
+	Mssql               = "mssql"
+	Sqlite              = "sqlite"
 )
 
 const postgresConnStrTemplate = "host={0} port={1} user={2} dbname={3} password={4} sslmode={5}"
 const mssqlConnStrTemplate = "sqlserver://{username}:{password}@{host}:{port}?database={dbname}"
+
 // todo: umv: think about charset as parameter
 const mysqlConnStrTemplate = "{username}:{password}@tcp({host}:{port})/{dbname}?charset=utf8mb4&parseTime=True&loc=Local"
 const postgresSystemDb = "postgres"
@@ -62,10 +63,10 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
  * Returns tuple og gorm.DB address of database context object and connStr
  */
 func CreateRandomDb(dialect SqlDialect, host string, port int, dbUser string, password string,
-	            useSsl string, options *g.Config) (*g.DB, string) {
+	useSsl string, options *g.Config) (*g.DB, string) {
 	random, _ := uuid.NewV4()
-	dbName := stringFormatter.Format(tmpDatabaseNameTemplate, strings.Replace(random.String(),"-", "", -1))
-	connStr := BuildConnectionString(dialect, host, port,dbName, dbUser, password, useSsl)
+	dbName := stringFormatter.Format(tmpDatabaseNameTemplate, strings.Replace(random.String(), "-", "", -1))
+	connStr := BuildConnectionString(dialect, host, port, dbName, dbUser, password, useSsl)
 	return OpenDb2(dialect, connStr, true, false, options), connStr
 }
 
@@ -89,7 +90,7 @@ func CreateRandomDb(dialect SqlDialect, host string, port int, dbUser string, pa
  * Returns gorm.DB address of database context object
  */
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
-	        useSsl string, create bool, check bool, options *g.Config) *g.DB {
+	useSsl string, create bool, check bool, options *g.Config) *g.DB {
 	connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
 	return OpenDb2(dialect, connStr, create, check, options)
 }
@@ -111,7 +112,7 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, option
 	dbCheckResult := false
 	if check {
 		// we check if check is true
-		dbCheckResult = CheckDb(dialect, connStr)
+		dbCheckResult = CheckDb(dialect, connStr, options)
 	}
 	if create == false {
 		if dbCheckResult == false && check == true {
@@ -125,7 +126,7 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, option
 	}
 
 	db, err := g.Open(createDialector(dialect, connStr), options)
-	if err != nil{
+	if err != nil {
 		return nil
 	}
 
@@ -139,8 +140,8 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, option
  *    - connStr - full connection string
  * Returns true if database exists otherwise false
  */
-func CheckDb(dialect SqlDialect, dbConnStr string) bool {
-	db, err := g.Open(createDialector(dialect, dbConnStr), nil)
+func CheckDb(dialect SqlDialect, dbConnStr string, options *g.Config) bool {
+	db, err := g.Open(createDialector(dialect, dbConnStr), options)
 	if err == nil {
 		sqlDb, err := db.DB()
 		if err == nil && sqlDb != nil {
@@ -176,9 +177,9 @@ func CloseDb(db *g.DB) bool {
  *    - dialect - string that represent using db driver inside gorm (see enum above)
  *    - connStr - full connection string
  */
-func DropDb(dialect SqlDialect, connStr string) bool {
+func DropDb(dialect SqlDialect, connStr string, options *g.Config) bool {
 	systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
-	return DropDb2(dialect, systemDbConnStr, dbName)
+	return DropDb2(dialect, systemDbConnStr, dbName, options)
 }
 
 // DropDb2
@@ -190,8 +191,8 @@ func DropDb(dialect SqlDialect, connStr string) bool {
  *     - dbName - name of database that should be deleted
  * Returns true if database was deleted / dropped
  */
-func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
-	db, err := g.Open(createDialector(dialect, systemDbConnStr), nil)
+func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string, options *g.Config) bool {
+	db, err := g.Open(createDialector(dialect, systemDbConnStr), options)
 	if err != nil {
 		return false
 	}
@@ -202,7 +203,7 @@ func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
 		return false
 	}
 	CloseDb(db)
-    return true
+	return true
 }
 
 // createSystemDbConnStr
@@ -218,19 +219,19 @@ func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
 func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string) {
 	connStrCopy := *connStr
 	if dialect == Postgres {
-        // replace dbname={
+		// replace dbname={
 		const postgresDbPattern = "dbname="
 		beginIndex := strings.Index(connStrCopy, postgresDbPattern)
 		if beginIndex < 0 {
 			return "", ""
 		}
-		endIndex := getSymbolIndex(&connStrCopy, ' ', beginIndex +  len(postgresDbPattern))
-		dbNameStr := connStrCopy[beginIndex: endIndex]
+		endIndex := getSymbolIndex(&connStrCopy, ' ', beginIndex+len(postgresDbPattern))
+		dbNameStr := connStrCopy[beginIndex:endIndex]
 		systemDbStr := postgresDbPattern + postgresSystemDb
 		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr[7:]
 
 	} else if dialect == Mssql {
-        const mssqlDbPattern = "?database="
+		const mssqlDbPattern = "?database="
 		beginIndex := strings.Index(connStrCopy, mssqlDbPattern)
 		if beginIndex < 0 {
 			return "", ""
@@ -240,12 +241,12 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
 		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr[10:]
 
 	} else if dialect == Mysql {
-        beginIndex := getSymbolIndex(&connStrCopy, '/', 0)
-        if beginIndex < 0 {
-        	return "", ""
+		beginIndex := getSymbolIndex(&connStrCopy, '/', 0)
+		if beginIndex < 0 {
+			return "", ""
 		}
 		endIndex := getSymbolIndex(&connStrCopy, '?', beginIndex)
-		dbNameStr := connStrCopy[beginIndex: endIndex]
+		dbNameStr := connStrCopy[beginIndex:endIndex]
 		systemDbStr := "/" + mysqlSystemDb
 		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr[1:]
 	}
@@ -265,16 +266,16 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
  * Returns connection string
  */
 func createConnStr(dialect SqlDialect, host string, port int, dbName string,
-	              dbUser string, password string, useSsl string) string {
+	dbUser string, password string, useSsl string) string {
 	connStr := ""
 	if dialect == Postgres {
-        connStr = stringFormatter.Format(postgresConnStrTemplate, host, port, dbUser, dbName, password, useSsl)
+		connStr = stringFormatter.Format(postgresConnStrTemplate, host, port, dbUser, dbName, password, useSsl)
 	} else if dialect == Mssql {
-        connStr = stringFormatter.FormatComplex(mssqlConnStrTemplate, map[string]interface{}{
-        	"username":dbUser, "password":password, "host":host, "port":port, "dbname":dbName})
+		connStr = stringFormatter.FormatComplex(mssqlConnStrTemplate, map[string]interface{}{
+			"username": dbUser, "password": password, "host": host, "port": port, "dbname": dbName})
 	} else if dialect == Mysql {
 		connStr = stringFormatter.FormatComplex(mysqlConnStrTemplate, map[string]interface{}{
-			"username":dbUser, "password":password, "host":host, "port":port, "dbname":dbName})
+			"username": dbUser, "password": password, "host": host, "port": port, "dbname": dbName})
 	}
 	return connStr
 }
@@ -293,7 +294,7 @@ func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, db
 	createStatementTemplate := "CREATE DATABASE {0}"
 	createStatement := stringFormatter.Format(createStatementTemplate, *dbName)
 
-	systemDb, err := g.Open(createDialector(dialect, *systemDbConnStr), nil)
+	systemDb, err := g.Open(createDialector(dialect, *systemDbConnStr), options)
 	if err != nil {
 		return nil
 	}
@@ -324,10 +325,10 @@ func getSymbolIndex(str *string, symbol rune, startIndex int) int {
 	}
 	for i := startIndex; i < len(*str); i++ {
 		if strSymbols[i] == symbol {
-            return i
+			return i
 		}
 	}
-	return  -1
+	return -1
 }
 
 // createDialector
@@ -342,11 +343,11 @@ func createDialector(dialect SqlDialect, dbConnStr string) g.Dialector {
 		return mysql.Open(dbConnStr)
 	}
 	if dialect == Mssql {
-        return sqlserver.Open(dbConnStr)
+		return sqlserver.Open(dbConnStr)
 	}
 	if dialect == Postgres {
 		return postgres.Open(dbConnStr)
 	}
-    //return sqlite.Open(dbConnStr)
-    return nil
+	//return sqlite.Open(dbConnStr)
+	return nil
 }
