@@ -72,7 +72,7 @@ func TestCheckIntegersSuccessfulWithoutOrder(t *testing.T) {
 	arr2[1] = 0
 	arr2[2] = 0
 
-	checkResult, err := CheckIntegers(t, arr1, arr2, false, true)
+	checkResult, err := CheckNumeric[int](t, arr1, arr2, false, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 
@@ -89,58 +89,58 @@ func TestCheckIntegersFailsWithoutOrder(t *testing.T) {
 	arr2[1] = 0
 	arr2[2] = 0
 
-	checkResult, err := CheckIntegers(t, arr1, arr2, false, false)
+	checkResult, err := CheckNumeric[int](t, arr1, arr2, false, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 
 }
 
 func TestCheckIntegersSuccessfulWithOrder(t *testing.T) {
-	arr1 := make([]int, 3)
+	arr1 := make([]int64, 3)
 	arr1[0] = 111
 	arr1[2] = 333
 	arr1[1] = 222
 
-	arr2 := make([]int, 3)
+	arr2 := make([]int64, 3)
 	arr2[0] = 111
 	arr2[1] = 222
 	arr2[2] = 333
 
-	checkResult, err := CheckIntegers(t, arr1, arr2, true, true)
+	checkResult, err := CheckNumeric[int64](t, arr1, arr2, true, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 }
 
 func TestCheckIntegersFailsWithOrder(t *testing.T) {
-	arr1 := make([]int, 3)
+	arr1 := make([]uint, 3)
 	arr1[0] = 111
 	arr1[2] = 3334
 	arr1[1] = 222
 
-	arr2 := make([]int, 3)
+	arr2 := make([]uint, 3)
 	arr2[0] = 111
 	arr2[1] = 222
 	arr2[2] = 333
 
-	checkResult, err := CheckIntegers(t, arr1, arr2, true, false)
+	checkResult, err := CheckNumeric[uint](t, arr1, arr2, true, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
 
 func TestCheckFloat32SuccessfulWithOrder(t *testing.T) {
-    arr1 := make([]float32, 3)
-    arr1[0] = 10.55
-    arr1[1] = 99
-    arr1[2] = 55.9
+	arr1 := make([]float32, 3)
+	arr1[0] = 10.55
+	arr1[1] = 99
+	arr1[2] = 55.9
 
-    arr2 := make([]float32, 3)
-    arr2[0] = 11.01
-    arr2[1] = 99
-    arr2[2] = 55.6
+	arr2 := make([]float32, 3)
+	arr2[0] = 11.01
+	arr2[1] = 99
+	arr2[2] = 55.6
 
-    checkResult, err := CheckFloats(t, arr1, arr2, 0.5, true, true)
-    assert.True(t, checkResult)
-    assert.Empty(t, err)
+	checkResult, err := CheckFloats(t, arr1, arr2, 0.5, true, true)
+	assert.True(t, checkResult)
+	assert.Empty(t, err)
 }
 
 func TestCheckFloat32FailsWithOrder(t *testing.T) {
@@ -192,17 +192,17 @@ func TestCheckFloat32FailsWithoutOrder(t *testing.T) {
 }
 
 func TestCheckFloat64SuccessfulWithOrder(t *testing.T) {
-	arr1 := make([]float64, 3)
+	arr1 := make([]float32, 3)
 	arr1[0] = 10.55
 	arr1[1] = 99
 	arr1[2] = 55.9
 
-	arr2 := make([]float64, 3)
+	arr2 := make([]float32, 3)
 	arr2[0] = 11.01
 	arr2[1] = 99
 	arr2[2] = 55.6
 
-	checkResult, err := CheckFloats64(t, arr1, arr2, 0.5, true, true)
+	checkResult, err := CheckFloats[float32](t, arr1, arr2, 0.5, true, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 }
@@ -218,7 +218,7 @@ func TestCheckFloat64FailsWithOrder(t *testing.T) {
 	arr2[1] = 99
 	arr2[2] = 55.6
 
-	checkResult, err := CheckFloats64(t, arr1, arr2, 0.5, true, false)
+	checkResult, err := CheckFloats[float64](t, arr1, arr2, 0.5, true, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
@@ -234,7 +234,7 @@ func TestCheckFloat64SuccessfulWithoutOrder(t *testing.T) {
 	arr2[1] = 199.99
 	arr2[2] = 129.123
 
-	checkResult, err := CheckFloats64(t, arr1, arr2, 0.5, false, true)
+	checkResult, err := CheckFloats[float64](t, arr1, arr2, 0.5, false, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 }
@@ -314,7 +314,7 @@ func TestCheckComplex64FailsWithoutOrder(t *testing.T) {
 	arr2[1] = complex(99, 100.91)
 	arr2[2] = complex(55.6, 66.88)
 
-	checkResult, err := CheckComplexes(t, arr1, arr2, 0.5, false, false)
+	checkResult, err := CheckComplexes[complex64](t, arr1, arr2, 0.5, false, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
