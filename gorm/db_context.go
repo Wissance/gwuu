@@ -23,6 +23,20 @@ const (
 	Sqlite              = "sqlite"
 )
 
+// Collation is a struct that could be used for different databases therefore it attempts to merge all options, see comments
+type Collation struct {
+	// Encoding represents string encoding type
+	/* 1. For Postgres most common options are: ENCODING 'UTF8' LC_COLLATE = 'american_usa' LC_CTYPE = 'american_usa'
+	 *    Therefore LC_CTYPE, LC_COLLATE & others similar will be stored in Parameters
+	 * 2. For Mysql i.e. CREATE DATABASE mydb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+	 *    Therefore CHARACTER SET storing in Encoding, Collate in Parameters
+	 * 3. For Mssql i.e. CREATE DATABASE MyOptionsTest COLLATE Latin1_General_100_CS_AS_SC;
+	 *    Therefore COLLATE stores in Encoding
+	 */
+	Encoding   string
+	Parameters map[string]string
+}
+
 const postgresConnStrTemplate = "host={0} port={1} user={2} dbname={3} password={4} sslmode={5}"
 const mssqlConnStrTemplate = "sqlserver://{username}:{password}@{host}:{port}?database={dbname}"
 
