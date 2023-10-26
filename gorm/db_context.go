@@ -53,7 +53,7 @@ const mysqlSystemDb = "mysql"
 
 const tmpDatabaseNameTemplate = "wissance_tmp_db_{0}"
 
-const postgresCollationOptionsTemplate = " ENCODING \\'{0}\\' {1} "
+const postgresCollationOptionsTemplate = " ENCODING '{0}' {1} "
 const mysqlCollationOptionsTemplate = " CHARACTER SET {0} {1} "
 const mssqlCollationOptionsTemplate = " COLLATE {0} "
 
@@ -394,13 +394,13 @@ func createCollationOption(dialect SqlDialect, collation *Collation) string {
 	switch dialect {
 	case Postgres:
 		if len(collation.Parameters) > 0 {
-			advOptions = stringFormatter.MapToString(collation.Parameters, "{k}=\\'{v}\\'", " ")
+			advOptions = stringFormatter.MapToString(collation.Parameters, "{key}='{value}'", " ")
 		}
 		encodingOpt := stringFormatter.Format(postgresCollationOptionsTemplate, collation.Encoding, advOptions)
 		return encodingOpt
 	case Mysql:
 		if len(collation.Parameters) > 0 {
-			advOptions = stringFormatter.MapToString(collation.Parameters, "{k} {v}", " ")
+			advOptions = stringFormatter.MapToString(collation.Parameters, "{key} {value}", " ")
 		}
 		encodingOpt := stringFormatter.Format(mysqlCollationOptionsTemplate, collation.Encoding, advOptions)
 		return encodingOpt
