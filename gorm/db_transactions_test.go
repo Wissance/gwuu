@@ -29,8 +29,7 @@ type User struct {
 
 func TestModelWithMultipleNestedTransactions(t *testing.T) {
 	cfg := g.Config{SkipDefaultTransaction: true}
-	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable",
-		&postgresCollation)
+	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
 	db := OpenDb2(Postgres, connStr, true, true, &cfg, &postgresCollation)
 	assert.NotNil(t, db)
 
@@ -79,8 +78,7 @@ func TestModelWithMultipleNestedTransactions(t *testing.T) {
 
 func TestModelWithMultipleManualTransactions(t *testing.T) {
 	cfg := g.Config{SkipDefaultTransaction: true}
-	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable",
-		&postgresCollation)
+	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
 	db := OpenDb2(Postgres, connStr, true, true, &cfg, &postgresCollation)
 	assert.NotNil(t, db)
 

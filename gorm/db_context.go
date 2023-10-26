@@ -72,8 +72,7 @@ const mssqlCollationOptionsTemplate = " COLLATE {0} "
  *    - collation a set of charset / collation options for database creation
  * Returns database connection string
  */
-func BuildConnectionString(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string, useSsl string,
-	collation *Collation) string {
+func BuildConnectionString(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string, useSsl string) string {
 	return createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
 }
 
@@ -94,7 +93,7 @@ func CreateRandomDb(dialect SqlDialect, host string, port int, dbUser string, pa
 	useSsl string, options *g.Config, collation *Collation) (*g.DB, string) {
 	random, _ := uuid.NewV4()
 	dbName := stringFormatter.Format(tmpDatabaseNameTemplate, strings.Replace(random.String(), "-", "", -1))
-	connStr := BuildConnectionString(dialect, host, port, dbName, dbUser, password, useSsl, collation)
+	connStr := BuildConnectionString(dialect, host, port, dbName, dbUser, password, useSsl)
 	return OpenDb2(dialect, connStr, true, false, options, collation), connStr
 }
 
