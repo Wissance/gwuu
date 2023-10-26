@@ -322,8 +322,9 @@ func createConnStr(dialect SqlDialect, host string, port int, dbName string,
  */
 func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string, options *g.Config, collation *Collation) *g.DB {
 	// todo(UMV): add collation according to dialect
-	createStatementTemplate := "CREATE DATABASE {0}"
-	createStatement := stringFormatter.Format(createStatementTemplate, *dbName)
+	createStatementTemplate := "CREATE DATABASE {0} {1}"
+	collationStatement := createCollationOption(dialect, collation)
+	createStatement := stringFormatter.Format(createStatementTemplate, *dbName, collationStatement)
 
 	systemDb, err := g.Open(createDialector(dialect, *systemDbConnStr), options)
 	if err != nil {
