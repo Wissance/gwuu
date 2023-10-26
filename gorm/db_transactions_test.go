@@ -20,22 +20,17 @@ type Role struct {
 
 type User struct {
 	gg.Model
-	UserName string `gorm:"type:varchar(128);not null;"`
+	UserName     string `gorm:"type:varchar(128);not null;"`
 	PasswordHash string `gorm:"type:varchar(255);not null;"`
-	ProfileId uint
-	Profile Profile `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Roles []Role `gorm:"many2many:user_roles;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` //
+	ProfileId    uint
+	Profile      Profile `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Roles        []Role  `gorm:"many2many:user_roles;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` //
 }
-
-/*type userRole struct {
-	UserID  int `gorm:"primaryKey"`
-	RoleID int `gorm:"primaryKey"`
-}*/
 
 func TestModelWithMultipleNestedTransactions(t *testing.T) {
 	cfg := g.Config{SkipDefaultTransaction: true}
 	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
-	db := OpenDb2(Postgres, connStr, true, true, &cfg)
+	db := OpenDb2(Postgres, connStr, true, true, &cfg, &postgresCollation)
 	assert.NotNil(t, db)
 
 	prepareDatabase(db)
@@ -53,8 +48,8 @@ func TestModelWithMultipleNestedTransactions(t *testing.T) {
 		return nil
 	})
 	var user User
-    db.Model(User{}).Where("user_name = ?", regularUser.UserName).First(&user)
-    assert.True(t, user.ID > 0)
+	db.Model(User{}).Where("user_name = ?", regularUser.UserName).First(&user)
+	assert.True(t, user.ID > 0)
 	// transaction 2, commit
 	db.Transaction(func(tx *g.DB) error {
 		role1 := Role{Name: "regular"}
@@ -75,16 +70,16 @@ func TestModelWithMultipleNestedTransactions(t *testing.T) {
 	})
 	db.Model(Role{}).Where("name = ?", "administrator").First(&role)
 	assert.True(t, role.ID > 0)
-    // Close
+	// Close
 	CloseDb(db)
 	// Drop
-	DropDb(Postgres, connStr)
+	DropDb(Postgres, connStr, &cfg)
 }
 
 func TestModelWithMultipleManualTransactions(t *testing.T) {
 	cfg := g.Config{SkipDefaultTransaction: true}
 	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
-	db := OpenDb2(Postgres, connStr, true, true, &cfg)
+	db := OpenDb2(Postgres, connStr, true, true, &cfg, &postgresCollation)
 	assert.NotNil(t, db)
 
 	prepareDatabase(db)
@@ -115,7 +110,7 @@ func TestModelWithMultipleManualTransactions(t *testing.T) {
 	// Close
 	CloseDb(db)
 	// Drop
-	DropDb(Postgres, connStr)
+	DropDb(Postgres, connStr, &cfg)
 }
 
 func prepareDatabase(db *g.DB) {

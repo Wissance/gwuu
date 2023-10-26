@@ -17,14 +17,34 @@ import (
 type SqlDialect string
 
 const (
-    Postgres SqlDialect = "postgres"
-    Mysql = "mysql"
-    Mssql = "mssql"
-    Sqlite = "sqlite"
+	Postgres SqlDialect = "postgres"
+	Mysql               = "mysql"
+	Mssql               = "mssql"
+	Sqlite              = "sqlite"
 )
+
+// Collation is a struct that could be used for different databases therefore it attempts to merge all options, see comments
+/* For Postgres we should pass Collation as Collation {Encoding: "UTF8", Params: map[string]string {"LC_COLLATE": "en_US.utf8",
+ *                                                                                                  "LC_CTYPE": "en_US.utf8"}
+ * For Mysql we should pass Collation {Encoding: "utf8mb4", Params: map[string]string {"COLLATE": "utf8mb4_unicode_ci"}
+ * For Mssql we should pass Collation {Encoding: "utf8", Params: map[string]string{}
+ */
+type Collation struct {
+	// Encoding represents string encoding type
+	/* 1. For Postgres most common options are: ENCODING 'UTF8' LC_COLLATE = 'american_usa' LC_CTYPE = 'american_usa'
+	 *    Therefore LC_CTYPE, LC_COLLATE & others similar will be stored in Parameters
+	 * 2. For Mysql i.e. CREATE DATABASE mydb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+	 *    Therefore CHARACTER SET storing in Encoding, Collate in Parameters
+	 * 3. For Mssql i.e. CREATE DATABASE MyOptionsTest COLLATE Latin1_General_100_CS_AS_SC;
+	 *    Therefore COLLATE stores in Encoding
+	 */
+	Encoding   string
+	Parameters map[string]string
+}
 
 const postgresConnStrTemplate = "host={0} port={1} user={2} dbname={3} password={4} sslmode={5}"
 const mssqlConnStrTemplate = "sqlserver://{username}:{password}@{host}:{port}?database={dbname}"
+
 // todo: umv: think about charset as parameter
 const mysqlConnStrTemplate = "{username}:{password}@tcp({host}:{port})/{dbname}?charset=utf8mb4&parseTime=True&loc=Local"
 const postgresSystemDb = "postgres"
@@ -32,6 +52,12 @@ const mssqlSystemDb = "master"
 const mysqlSystemDb = "mysql"
 
 const tmpDatabaseNameTemplate = "wissance_tmp_db_{0}"
+
+const postgresCollationOptionsTemplate = " ENCODING '{0}' {1} "
+const mysqlCollationOptionsTemplate = " CHARACTER SET {0} {1} "
+const mssqlCollationOptionsTemplate = " COLLATE {0} "
+
+// const mySqlCollateOption = "COLLATE"
 
 // BuildConnectionString
 /* Function that builds connection string from individual parameters to use in OpenDb2
@@ -43,6 +69,7 @@ const tmpDatabaseNameTemplate = "wissance_tmp_db_{0}"
  *    - dbUser - user that is using for perform operations on dbName
  *    - password - dbUser password
  *    - useSsl - is a string value that currently is using with Postgres Sql Only (allowed options are: disable, and others for enable)
+ *    - collation a set of charset / collation options for database creation
  * Returns database connection string
  */
 func BuildConnectionString(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string, useSsl string) string {
@@ -58,15 +85,16 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
  *    - port - integer value representing server tcp port (typically 5432 for postgres, 3306 for mysql and 1433 for mssql)
  *    - dbUser - user that is using for perform operations on dbName
  *    - password - dbUser password
- *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
+ *    - options - gorm config (from gorm.io/gorm NOT from github.com/jinzhu/gorm)
+ *    - collation a set of charset / collation options for database creation
  * Returns tuple og gorm.DB address of database context object and connStr
  */
 func CreateRandomDb(dialect SqlDialect, host string, port int, dbUser string, password string,
-	            useSsl string, options *g.Config) (*g.DB, string) {
+	useSsl string, options *g.Config, collation *Collation) (*g.DB, string) {
 	random, _ := uuid.NewV4()
-	dbName := stringFormatter.Format(tmpDatabaseNameTemplate, strings.Replace(random.String(),"-", "", -1))
-	connStr := BuildConnectionString(dialect, host, port,dbName, dbUser, password, useSsl)
-	return OpenDb2(dialect, connStr, true, false, options), connStr
+	dbName := stringFormatter.Format(tmpDatabaseNameTemplate, strings.Replace(random.String(), "-", "", -1))
+	connStr := BuildConnectionString(dialect, host, port, dbName, dbUser, password, useSsl)
+	return OpenDb2(dialect, connStr, true, false, options, collation), connStr
 }
 
 // OpenDb
@@ -85,13 +113,14 @@ func CreateRandomDb(dialect SqlDialect, host string, port int, dbUser string, pa
  *    - create - if true we should create database if it does not exist
  *    - check - if true existence of database is checking otherwise not (we sure that this is a random database and to save
  *              some time we could omit existence check)
- *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
+ *    - options - gorm config (from gorm.io/gorm NOT from github.com/jinzhu/gorm)
+ *    - collation a set of charset / collation options for database creation
  * Returns gorm.DB address of database context object
  */
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
-	        useSsl string, create bool, check bool, options *g.Config) *g.DB {
+	useSsl string, create bool, check bool, options *g.Config, collation *Collation) *g.DB {
 	connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
-	return OpenDb2(dialect, connStr, create, check, options)
+	return OpenDb2(dialect, connStr, create, check, options, collation)
 }
 
 // OpenDb2
@@ -104,14 +133,15 @@ func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser str
  *    - create - if true we should create database if it does not exist
  *    - check - if true existence of database is checking otherwise not (we sure that this is a random database and to save
  *              some time we could omit existence check)
- *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
+ *    - options - gorm config (from gorm.io/gorm NOT from github.com/jinzhu/gorm)
+ *    - collation a set of charset / collation options for database creation
  */
-func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, options *g.Config) *g.DB {
+func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, options *g.Config, collation *Collation) *g.DB {
 	// by default, we set dbCheckResult to true (for case when check is not needed)
 	dbCheckResult := false
 	if check {
 		// we check if check is true
-		dbCheckResult = CheckDb(dialect, connStr)
+		dbCheckResult = CheckDb(dialect, connStr, options)
 	}
 	if create == false {
 		if dbCheckResult == false && check == true {
@@ -120,12 +150,12 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, option
 	} else {
 		if !dbCheckResult {
 			systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
-			return createDb(dialect, &systemDbConnStr, &connStr, &dbName, options)
+			return createDb(dialect, &systemDbConnStr, &connStr, &dbName, options, collation)
 		}
 	}
 
 	db, err := g.Open(createDialector(dialect, connStr), options)
-	if err != nil{
+	if err != nil {
 		return nil
 	}
 
@@ -139,12 +169,12 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, option
  *    - connStr - full connection string
  * Returns true if database exists otherwise false
  */
-func CheckDb(dialect SqlDialect, dbConnStr string) bool {
-	db, err := g.Open(createDialector(dialect, dbConnStr), nil)
+func CheckDb(dialect SqlDialect, dbConnStr string, options *g.Config) bool {
+	db, err := g.Open(createDialector(dialect, dbConnStr), options)
 	if err == nil {
-		sqlDb, err := db.DB()
-		if err == nil && sqlDb != nil {
-			err = sqlDb.Close()
+		sqlDb, dbErr := db.DB()
+		if dbErr == nil && sqlDb != nil {
+			_ = sqlDb.Close()
 		}
 		return true
 	}
@@ -176,9 +206,9 @@ func CloseDb(db *g.DB) bool {
  *    - dialect - string that represent using db driver inside gorm (see enum above)
  *    - connStr - full connection string
  */
-func DropDb(dialect SqlDialect, connStr string) bool {
+func DropDb(dialect SqlDialect, connStr string, options *g.Config) bool {
 	systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
-	return DropDb2(dialect, systemDbConnStr, dbName)
+	return DropDb2(dialect, systemDbConnStr, dbName, options)
 }
 
 // DropDb2
@@ -190,8 +220,8 @@ func DropDb(dialect SqlDialect, connStr string) bool {
  *     - dbName - name of database that should be deleted
  * Returns true if database was deleted / dropped
  */
-func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
-	db, err := g.Open(createDialector(dialect, systemDbConnStr), nil)
+func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string, options *g.Config) bool {
+	db, err := g.Open(createDialector(dialect, systemDbConnStr), options)
 	if err != nil {
 		return false
 	}
@@ -202,7 +232,7 @@ func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
 		return false
 	}
 	CloseDb(db)
-    return true
+	return true
 }
 
 // createSystemDbConnStr
@@ -218,19 +248,19 @@ func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string) bool {
 func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string) {
 	connStrCopy := *connStr
 	if dialect == Postgres {
-        // replace dbname={
+		// replace dbname={
 		const postgresDbPattern = "dbname="
 		beginIndex := strings.Index(connStrCopy, postgresDbPattern)
 		if beginIndex < 0 {
 			return "", ""
 		}
-		endIndex := getSymbolIndex(&connStrCopy, ' ', beginIndex +  len(postgresDbPattern))
-		dbNameStr := connStrCopy[beginIndex: endIndex]
+		endIndex := getSymbolIndex(&connStrCopy, ' ', beginIndex+len(postgresDbPattern))
+		dbNameStr := connStrCopy[beginIndex:endIndex]
 		systemDbStr := postgresDbPattern + postgresSystemDb
 		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr[7:]
 
 	} else if dialect == Mssql {
-        const mssqlDbPattern = "?database="
+		const mssqlDbPattern = "?database="
 		beginIndex := strings.Index(connStrCopy, mssqlDbPattern)
 		if beginIndex < 0 {
 			return "", ""
@@ -240,12 +270,12 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
 		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr[10:]
 
 	} else if dialect == Mysql {
-        beginIndex := getSymbolIndex(&connStrCopy, '/', 0)
-        if beginIndex < 0 {
-        	return "", ""
+		beginIndex := getSymbolIndex(&connStrCopy, '/', 0)
+		if beginIndex < 0 {
+			return "", ""
 		}
 		endIndex := getSymbolIndex(&connStrCopy, '?', beginIndex)
-		dbNameStr := connStrCopy[beginIndex: endIndex]
+		dbNameStr := connStrCopy[beginIndex:endIndex]
 		systemDbStr := "/" + mysqlSystemDb
 		return strings.Replace(connStrCopy, dbNameStr, systemDbStr, 1), dbNameStr[1:]
 	}
@@ -265,16 +295,16 @@ func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string)
  * Returns connection string
  */
 func createConnStr(dialect SqlDialect, host string, port int, dbName string,
-	              dbUser string, password string, useSsl string) string {
+	dbUser string, password string, useSsl string) string {
 	connStr := ""
 	if dialect == Postgres {
-        connStr = stringFormatter.Format(postgresConnStrTemplate, host, port, dbUser, dbName, password, useSsl)
+		connStr = stringFormatter.Format(postgresConnStrTemplate, host, port, dbUser, dbName, password, useSsl)
 	} else if dialect == Mssql {
-        connStr = stringFormatter.FormatComplex(mssqlConnStrTemplate, map[string]interface{}{
-        	"username":dbUser, "password":password, "host":host, "port":port, "dbname":dbName})
+		connStr = stringFormatter.FormatComplex(mssqlConnStrTemplate, map[string]interface{}{
+			"username": dbUser, "password": password, "host": host, "port": port, "dbname": dbName})
 	} else if dialect == Mysql {
 		connStr = stringFormatter.FormatComplex(mysqlConnStrTemplate, map[string]interface{}{
-			"username":dbUser, "password":password, "host":host, "port":port, "dbname":dbName})
+			"username": dbUser, "password": password, "host": host, "port": port, "dbname": dbName})
 	}
 	return connStr
 }
@@ -287,13 +317,16 @@ func createConnStr(dialect SqlDialect, host string, port int, dbName string,
  *    - dbConnStr - target database connection string
  *    - dbName - database name
  *    - options - gorm context configuration
+ *    - collation a set of charset / collation options for database creation
  * Return pointer to database context
  */
-func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string, options *g.Config) *g.DB {
-	createStatementTemplate := "CREATE DATABASE {0}"
-	createStatement := stringFormatter.Format(createStatementTemplate, *dbName)
+func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string, options *g.Config, collation *Collation) *g.DB {
+	// todo(UMV): add collation according to dialect
+	createStatementTemplate := "CREATE DATABASE {0} {1}"
+	collationStatement := createCollationOption(dialect, collation)
+	createStatement := stringFormatter.Format(createStatementTemplate, *dbName, collationStatement)
 
-	systemDb, err := g.Open(createDialector(dialect, *systemDbConnStr), nil)
+	systemDb, err := g.Open(createDialector(dialect, *systemDbConnStr), options)
 	if err != nil {
 		return nil
 	}
@@ -324,10 +357,10 @@ func getSymbolIndex(str *string, symbol rune, startIndex int) int {
 	}
 	for i := startIndex; i < len(*str); i++ {
 		if strSymbols[i] == symbol {
-            return i
+			return i
 		}
 	}
-	return  -1
+	return -1
 }
 
 // createDialector
@@ -342,11 +375,39 @@ func createDialector(dialect SqlDialect, dbConnStr string) g.Dialector {
 		return mysql.Open(dbConnStr)
 	}
 	if dialect == Mssql {
-        return sqlserver.Open(dbConnStr)
+		return sqlserver.Open(dbConnStr)
 	}
 	if dialect == Postgres {
 		return postgres.Open(dbConnStr)
 	}
-    //return sqlite.Open(dbConnStr)
-    return nil
+	//return sqlite.Open(dbConnStr)
+	return nil
+}
+
+func createCollationOption(dialect SqlDialect, collation *Collation) string {
+	if collation == nil || len(collation.Encoding) == 0 {
+		return ""
+	}
+
+	advOptions := ""
+
+	switch dialect {
+	case Postgres:
+		if len(collation.Parameters) > 0 {
+			advOptions = stringFormatter.MapToString(collation.Parameters, "{key}='{value}'", " ")
+		}
+		encodingOpt := stringFormatter.Format(postgresCollationOptionsTemplate, collation.Encoding, advOptions)
+		return encodingOpt
+	case Mysql:
+		if len(collation.Parameters) > 0 {
+			advOptions = stringFormatter.MapToString(collation.Parameters, "{key} {value}", " ")
+		}
+		encodingOpt := stringFormatter.Format(mysqlCollationOptionsTemplate, collation.Encoding, advOptions)
+		return encodingOpt
+	case Mssql:
+		encodingOpt := stringFormatter.Format(mssqlCollationOptionsTemplate, collation.Encoding)
+		return encodingOpt
+	default:
+		return ""
+	}
 }
