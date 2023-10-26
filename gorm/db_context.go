@@ -24,6 +24,11 @@ const (
 )
 
 // Collation is a struct that could be used for different databases therefore it attempts to merge all options, see comments
+/* For Postgres we should pass Collation as Collation {Encoding: "UTF8", Params: map[string]string {"LC_COLLATE": "american_usa",
+ *                                                                                                  "LC_CTYPE": "american_usa"}
+ * For Mysql we should pass Collation {Encoding: "utf8mb4", Params: map[string]string {"COLLATION": "utf8mb4_unicode_ci"}
+ * For Mssql we should pass Collation {Encoding: "utf8", Params: map[string]string{}
+ */
 type Collation struct {
 	// Encoding represents string encoding type
 	/* 1. For Postgres most common options are: ENCODING 'UTF8' LC_COLLATE = 'american_usa' LC_CTYPE = 'american_usa'
@@ -58,9 +63,11 @@ const tmpDatabaseNameTemplate = "wissance_tmp_db_{0}"
  *    - dbUser - user that is using for perform operations on dbName
  *    - password - dbUser password
  *    - useSsl - is a string value that currently is using with Postgres Sql Only (allowed options are: disable, and others for enable)
+ *    - collation a set of charset / collation options for database creation
  * Returns database connection string
  */
-func BuildConnectionString(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string, useSsl string) string {
+func BuildConnectionString(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string, useSsl string,
+	collation *Collation) string {
 	return createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
 }
 
@@ -73,15 +80,16 @@ func BuildConnectionString(dialect SqlDialect, host string, port int, dbName str
  *    - port - integer value representing server tcp port (typically 5432 for postgres, 3306 for mysql and 1433 for mssql)
  *    - dbUser - user that is using for perform operations on dbName
  *    - password - dbUser password
- *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
+ *    - options - gorm config (from gorm.io/gorm NOT from github.com/jinzhu/gorm)
+ *    - collation a set of charset / collation options for database creation
  * Returns tuple og gorm.DB address of database context object and connStr
  */
 func CreateRandomDb(dialect SqlDialect, host string, port int, dbUser string, password string,
-	useSsl string, options *g.Config) (*g.DB, string) {
+	useSsl string, options *g.Config, collation *Collation) (*g.DB, string) {
 	random, _ := uuid.NewV4()
 	dbName := stringFormatter.Format(tmpDatabaseNameTemplate, strings.Replace(random.String(), "-", "", -1))
-	connStr := BuildConnectionString(dialect, host, port, dbName, dbUser, password, useSsl)
-	return OpenDb2(dialect, connStr, true, false, options), connStr
+	connStr := BuildConnectionString(dialect, host, port, dbName, dbUser, password, useSsl, collation)
+	return OpenDb2(dialect, connStr, true, false, options, collation), connStr
 }
 
 // OpenDb
@@ -100,13 +108,14 @@ func CreateRandomDb(dialect SqlDialect, host string, port int, dbUser string, pa
  *    - create - if true we should create database if it does not exist
  *    - check - if true existence of database is checking otherwise not (we sure that this is a random database and to save
  *              some time we could omit existence check)
- *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
+ *    - options - gorm config (from gorm.io/gorm NOT from github.com/jinzhu/gorm)
+ *    - collation a set of charset / collation options for database creation
  * Returns gorm.DB address of database context object
  */
 func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser string, password string,
-	useSsl string, create bool, check bool, options *g.Config) *g.DB {
+	useSsl string, create bool, check bool, options *g.Config, collation *Collation) *g.DB {
 	connStr := createConnStr(dialect, host, port, dbName, dbUser, password, useSsl)
-	return OpenDb2(dialect, connStr, create, check, options)
+	return OpenDb2(dialect, connStr, create, check, options, collation)
 }
 
 // OpenDb2
@@ -119,9 +128,10 @@ func OpenDb(dialect SqlDialect, host string, port int, dbName string, dbUser str
  *    - create - if true we should create database if it does not exist
  *    - check - if true existence of database is checking otherwise not (we sure that this is a random database and to save
  *              some time we could omit existence check)
- *    - options - gorm config (from gorm.io/gorm not from github.com/jinzhu/gorm)
+ *    - options - gorm config (from gorm.io/gorm NOT from github.com/jinzhu/gorm)
+ *    - collation a set of charset / collation options for database creation
  */
-func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, options *g.Config) *g.DB {
+func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, options *g.Config, collation *Collation) *g.DB {
 	// by default, we set dbCheckResult to true (for case when check is not needed)
 	dbCheckResult := false
 	if check {
@@ -135,7 +145,7 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, option
 	} else {
 		if !dbCheckResult {
 			systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
-			return createDb(dialect, &systemDbConnStr, &connStr, &dbName, options)
+			return createDb(dialect, &systemDbConnStr, &connStr, &dbName, options, collation)
 		}
 	}
 
@@ -157,9 +167,9 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, option
 func CheckDb(dialect SqlDialect, dbConnStr string, options *g.Config) bool {
 	db, err := g.Open(createDialector(dialect, dbConnStr), options)
 	if err == nil {
-		sqlDb, err := db.DB()
-		if err == nil && sqlDb != nil {
-			err = sqlDb.Close()
+		sqlDb, dbErr := db.DB()
+		if dbErr == nil && sqlDb != nil {
+			_ = sqlDb.Close()
 		}
 		return true
 	}
@@ -302,9 +312,11 @@ func createConnStr(dialect SqlDialect, host string, port int, dbName string,
  *    - dbConnStr - target database connection string
  *    - dbName - database name
  *    - options - gorm context configuration
+ *    - collation a set of charset / collation options for database creation
  * Return pointer to database context
  */
-func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string, options *g.Config) *g.DB {
+func createDb(dialect SqlDialect, systemDbConnStr *string, dbConnStr *string, dbName *string, options *g.Config, collation *Collation) *g.DB {
+	// todo(UMV): add collation according to dialect
 	createStatementTemplate := "CREATE DATABASE {0}"
 	createStatement := stringFormatter.Format(createStatementTemplate, *dbName)
 
