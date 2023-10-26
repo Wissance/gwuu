@@ -27,15 +27,11 @@ type User struct {
 	Roles        []Role  `gorm:"many2many:user_roles;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` //
 }
 
-/*type userRole struct {
-	UserID  int `gorm:"primaryKey"`
-	RoleID int `gorm:"primaryKey"`
-}*/
-
 func TestModelWithMultipleNestedTransactions(t *testing.T) {
 	cfg := g.Config{SkipDefaultTransaction: true}
-	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
-	db := OpenDb2(Postgres, connStr, true, true, &cfg)
+	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable",
+		&postgresCollation)
+	db := OpenDb2(Postgres, connStr, true, true, &cfg, &postgresCollation)
 	assert.NotNil(t, db)
 
 	prepareDatabase(db)
@@ -83,8 +79,9 @@ func TestModelWithMultipleNestedTransactions(t *testing.T) {
 
 func TestModelWithMultipleManualTransactions(t *testing.T) {
 	cfg := g.Config{SkipDefaultTransaction: true}
-	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
-	db := OpenDb2(Postgres, connStr, true, true, &cfg)
+	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable",
+		&postgresCollation)
+	db := OpenDb2(Postgres, connStr, true, true, &cfg, &postgresCollation)
 	assert.NotNil(t, db)
 
 	prepareDatabase(db)

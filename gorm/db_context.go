@@ -24,9 +24,9 @@ const (
 )
 
 // Collation is a struct that could be used for different databases therefore it attempts to merge all options, see comments
-/* For Postgres we should pass Collation as Collation {Encoding: "UTF8", Params: map[string]string {"LC_COLLATE": "american_usa",
- *                                                                                                  "LC_CTYPE": "american_usa"}
- * For Mysql we should pass Collation {Encoding: "utf8mb4", Params: map[string]string {"COLLATION": "utf8mb4_unicode_ci"}
+/* For Postgres we should pass Collation as Collation {Encoding: "UTF8", Params: map[string]string {"LC_COLLATE": "en_US.utf8",
+ *                                                                                                  "LC_CTYPE": "en_US.utf8"}
+ * For Mysql we should pass Collation {Encoding: "utf8mb4", Params: map[string]string {"COLLATE": "utf8mb4_unicode_ci"}
  * For Mssql we should pass Collation {Encoding: "utf8", Params: map[string]string{}
  */
 type Collation struct {
