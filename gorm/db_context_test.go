@@ -76,20 +76,32 @@ func TestMssqlOpenSystemDb(t *testing.T) {
 func TestPostgresOpenDbWithCreate(t *testing.T) {
 	// Create Db when open
 	cfg := gorm.Config{}
+	// with collation
 	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_examples", dbUser, dbPassword, "disable")
 	testOpenDbWithCreateAndCheck(t, connStr, Postgres, &cfg, &postgresCollation)
+	// without collation
+	connStr = BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_examples_2", dbUser, dbPassword, "disable")
+	testOpenDbWithCreateAndCheck(t, connStr, Postgres, &cfg, nil)
 }
 
 func TestMysqlOpenDbWithCreate(t *testing.T) {
 	cfg := gorm.Config{}
+	// with collation
 	connStr := BuildConnectionString(Mysql, "127.0.0.1", 3306, "gwuu_examples", dbUser, dbPassword, "")
 	testOpenDbWithCreateAndCheck(t, connStr, Mysql, &cfg, &mysqlCollation)
+	// without collation
+	connStr = BuildConnectionString(Mysql, "127.0.0.1", 3306, "gwuu_examples", dbUser, dbPassword, "")
+	testOpenDbWithCreateAndCheck(t, connStr, Mysql, &cfg, nil)
 }
 
 func TestMssqlOpenDbWithCreate(t *testing.T) {
 	cfg := gorm.Config{}
+	// with collation
 	connStr := BuildConnectionString(Mssql, "localhost", 1433, "GwuuExamples", dbUser, dbPassword, "")
 	testOpenDbWithCreateAndCheck(t, connStr, Mssql, &cfg, &mssqlCollation)
+	// without collation
+	connStr = BuildConnectionString(Mssql, "localhost", 1433, "GwuuExamples", dbUser, dbPassword, "")
+	testOpenDbWithCreateAndCheck(t, connStr, Mssql, &cfg, nil)
 }
 
 func TestCreateRandomDb(t *testing.T) {
