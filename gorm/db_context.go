@@ -53,6 +53,12 @@ const mysqlSystemDb = "mysql"
 
 const tmpDatabaseNameTemplate = "wissance_tmp_db_{0}"
 
+const postgresCollationOptionsTemplate = " ENCODING \\'{0}\\' {1} "
+const mysqlCollationOptionsTemplate = " CHARACTER SET {0} {1} "
+const mssqlCollationOptionsTemplate = " COLLATE {0} "
+
+// const mySqlCollateOption = "COLLATE"
+
 // BuildConnectionString
 /* Function that builds connection string from individual parameters to use in OpenDb2
  * Parameters:
@@ -376,4 +382,32 @@ func createDialector(dialect SqlDialect, dbConnStr string) g.Dialector {
 	}
 	//return sqlite.Open(dbConnStr)
 	return nil
+}
+
+func createCollationOption(dialect SqlDialect, collation *Collation) string {
+	if collation == nil || len(collation.Encoding) == 0 {
+		return ""
+	}
+
+	advOptions := ""
+
+	switch dialect {
+	case Postgres:
+		if len(collation.Parameters) > 0 {
+			advOptions = stringFormatter.MapToString(collation.Parameters, "{k}=\\'{v}\\'", " ")
+		}
+		encodingOpt := stringFormatter.Format(postgresCollationOptionsTemplate, collation.Encoding, advOptions)
+		return encodingOpt
+	case Mysql:
+		if len(collation.Parameters) > 0 {
+			advOptions = stringFormatter.MapToString(collation.Parameters, "{k} {v}", " ")
+		}
+		encodingOpt := stringFormatter.Format(mysqlCollationOptionsTemplate, collation.Encoding, advOptions)
+		return encodingOpt
+	case Mssql:
+		encodingOpt := stringFormatter.Format(mssqlCollationOptionsTemplate, collation.Encoding)
+		return encodingOpt
+	default:
+		return ""
+	}
 }
