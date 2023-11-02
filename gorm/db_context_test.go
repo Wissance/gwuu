@@ -12,7 +12,8 @@ const dbUser = "developer"
 const dbPassword = "123"
 
 // ############################################# test options data ####################################################
-var postgresCollation = Collation{Encoding: "UTF8"}
+var postgresCollation = Collation{Encoding: "UTF8", Parameters: map[string]string{"LC_COLLATE": "C",
+	"LC_CTYPE": "C", "TEMPLATE": "template0"}}
 
 //Parameters: map[string]string{"LC_CTYPE": "en_US.utf8", "LC_COLLATE": "en_US.utf8"}
 
