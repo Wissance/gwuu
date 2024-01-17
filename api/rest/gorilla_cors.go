@@ -9,19 +9,19 @@ import (
 const (
 	// AccessControlAllowMethodsHeader - CORS Header that says what HTTP Methods are allowed to specific endpoint
 	AccessControlAllowMethodsHeader = "Access-Control-Allow-Methods"
-	AccessControlAllowOriginHeader = "Access-Control-Allow-Origin"
+	AccessControlAllowOriginHeader  = "Access-Control-Allow-Origin"
 	AccessControlAllowHeadersHeader = "Access-Control-Allow-Headers"
 	// Value that allow all headers
-	AnyOrigin = "*"
+	AnyOrigin            = "*"
 	AllowAllHeaderValues = "*"
-	optionsRouteSuffix = "opts"
+	optionsRouteSuffix   = "opts"
 )
 
 type WebApiHandler struct {
 	corsConfig map[string][]string
-	AllowCors bool
-	Origin string
-	Router *m.Router
+	AllowCors  bool
+	Origin     string
+	Router     *m.Router
 }
 
 // NewWebApiHandler
@@ -32,9 +32,9 @@ type WebApiHandler struct {
  */
 func NewWebApiHandler(allowCors bool, origin string) *WebApiHandler {
 	handler := &WebApiHandler{
-		AllowCors: allowCors,
-		Origin: origin,
-		Router: m.NewRouter(),
+		AllowCors:  allowCors,
+		Origin:     origin,
+		Router:     m.NewRouter(),
 		corsConfig: map[string][]string{},
 	}
 	if allowCors {
@@ -72,7 +72,6 @@ func addCorsHeaders(respWriter *http.ResponseWriter, origin string) {
 	(*respWriter).Header().Set(AccessControlAllowOriginHeader, origin)
 }
 
-
 func (handler *WebApiHandler) handlePreflightReq(respWriter http.ResponseWriter, request *http.Request) {
 	route := m.CurrentRoute(request)
 	if route != nil {
@@ -94,7 +93,6 @@ func join(values []string, separator string) string {
 	}
 	return line
 }
-
 
 // handleWithCors function that adds CORS headers before handler func is called
 func (handler *WebApiHandler) handleWithCors(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
@@ -122,9 +120,15 @@ func (handler *WebApiHandler) handleWithCors(f func(http.ResponseWriter, *http.R
 func (handler *WebApiHandler) HandleFunc(router *m.Router, path string, f func(http.ResponseWriter, *http.Request), handlerMethods ...string) *m.Route {
 	// 1. Create Route ...
 	route := router.HandleFunc(path, handler.handleWithCors(f)).Methods(handlerMethods...)
+	actualRoutePath := path
+	// This code taking into account that router is a SubRouter
+	s, err := route.GetPathTemplate()
+	if err == nil {
+		actualRoutePath = s
+	}
 	if handler.AllowCors {
 		// 2. Create Options route
-		optionRouteName := stringFormatter.Format("{0}_{1}", path, optionsRouteSuffix)
+		optionRouteName := stringFormatter.Format("{0}_{1}", actualRoutePath, optionsRouteSuffix)
 		optionsRoute := router.GetRoute(optionRouteName)
 		if optionsRoute == nil {
 			// there is no Route with such name, so we could easily create it and assign methods = "OPTIONS" + handlerMethods
@@ -137,4 +141,3 @@ func (handler *WebApiHandler) HandleFunc(router *m.Router, path string, f func(h
 	}
 	return route
 }
-
