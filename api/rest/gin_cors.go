@@ -24,28 +24,48 @@ func NewGinBasedWebApiHandler(allowCors bool, origin string, opts ...g.OptionFun
 	return &handler
 }
 
-func (handler *GinBasedWebApiHandler) GET(path string, f func(ctx *g.Context)) {
-	handler.Router.GET(path, f)
+func (handler *GinBasedWebApiHandler) GET(routerGroup *g.RouterGroup, path string, f func(ctx *g.Context)) {
+	if routerGroup == nil {
+		handler.Router.GET(path, f)
+	} else {
+		routerGroup.GET(path, f)
+	}
 	handler.addCorsHandler(path, http.MethodGet)
 }
 
-func (handler *GinBasedWebApiHandler) POST(path string, f func(ctx *g.Context)) {
-	handler.Router.POST(path, handler.handleWithCors(f))
+func (handler *GinBasedWebApiHandler) POST(routerGroup *g.RouterGroup, path string, f func(ctx *g.Context)) {
+	if routerGroup == nil {
+		handler.Router.POST(path, handler.handleWithCors(f))
+	} else {
+		routerGroup.POST(path, f)
+	}
 	handler.addCorsHandler(path, http.MethodPost)
 }
 
-func (handler *GinBasedWebApiHandler) PUT(path string, f func(ctx *g.Context)) {
-	handler.Router.PUT(path, handler.handleWithCors(f))
+func (handler *GinBasedWebApiHandler) PUT(routerGroup *g.RouterGroup, path string, f func(ctx *g.Context)) {
+	if routerGroup == nil {
+		handler.Router.PUT(path, handler.handleWithCors(f))
+	} else {
+		routerGroup.PUT(path, f)
+	}
 	handler.addCorsHandler(path, http.MethodPut)
 }
 
-func (handler *GinBasedWebApiHandler) PATCH(path string, f func(ctx *g.Context)) {
-	handler.Router.PATCH(path, handler.handleWithCors(f))
+func (handler *GinBasedWebApiHandler) PATCH(routerGroup *g.RouterGroup, path string, f func(ctx *g.Context)) {
+	if routerGroup == nil {
+		handler.Router.PATCH(path, handler.handleWithCors(f))
+	} else {
+		routerGroup.PATCH(path, f)
+	}
 	handler.addCorsHandler(path, http.MethodPatch)
 }
 
-func (handler *GinBasedWebApiHandler) DELETE(path string, f func(ctx *g.Context)) {
-	handler.Router.DELETE(path, handler.handleWithCors(f))
+func (handler *GinBasedWebApiHandler) DELETE(routerGroup *g.RouterGroup, path string, f func(ctx *g.Context)) {
+	if routerGroup == nil {
+		handler.Router.DELETE(path, handler.handleWithCors(f))
+	} else {
+		routerGroup.DELETE(path, handler.handleWithCors(f))
+	}
 	handler.addCorsHandler(path, http.MethodDelete)
 }
 

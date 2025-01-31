@@ -11,6 +11,7 @@ const (
 	AnyOrigin            = "*"
 	AllowAllHeaderValues = "*"
 	optionsRouteSuffix   = "opts"
+	pathVariableSign     = ":"
 )
 
 func getRouteBasePath(path string) string {
@@ -21,7 +22,9 @@ func getRouteBasePath(path string) string {
 
 	basePath := trimmedPath
 	basePathEndIndex := strings.LastIndex(trimmedPath, "/")
+	// pathVariableSignIndex := strings.LastIndex(trimmedPath, pathVariableSign)
 	if basePathEndIndex > 0 {
+		// if pathVariableSignIndex > basePathEndIndex
 		basePath = trimmedPath[0 : basePathEndIndex-1]
 	}
 	return basePath
