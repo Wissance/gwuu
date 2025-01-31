@@ -30,7 +30,8 @@ func (handler *GinBasedWebApiHandler) GET(routerGroup *g.RouterGroup, path strin
 	} else {
 		routerGroup.GET(path, f)
 	}
-	handler.addCorsHandler(path, http.MethodGet)
+
+	handler.addCorsHandler(handler.getRouteBasePath(routerGroup, path))
 }
 
 func (handler *GinBasedWebApiHandler) POST(routerGroup *g.RouterGroup, path string, f func(ctx *g.Context)) {
@@ -39,7 +40,7 @@ func (handler *GinBasedWebApiHandler) POST(routerGroup *g.RouterGroup, path stri
 	} else {
 		routerGroup.POST(path, f)
 	}
-	handler.addCorsHandler(path, http.MethodPost)
+	handler.addCorsHandler(handler.getRouteBasePath(routerGroup, path))
 }
 
 func (handler *GinBasedWebApiHandler) PUT(routerGroup *g.RouterGroup, path string, f func(ctx *g.Context)) {
@@ -48,7 +49,7 @@ func (handler *GinBasedWebApiHandler) PUT(routerGroup *g.RouterGroup, path strin
 	} else {
 		routerGroup.PUT(path, f)
 	}
-	handler.addCorsHandler(path, http.MethodPut)
+	handler.addCorsHandler(handler.getRouteBasePath(routerGroup, path))
 }
 
 func (handler *GinBasedWebApiHandler) PATCH(routerGroup *g.RouterGroup, path string, f func(ctx *g.Context)) {
@@ -57,7 +58,7 @@ func (handler *GinBasedWebApiHandler) PATCH(routerGroup *g.RouterGroup, path str
 	} else {
 		routerGroup.PATCH(path, f)
 	}
-	handler.addCorsHandler(path, http.MethodPatch)
+	handler.addCorsHandler(handler.getRouteBasePath(routerGroup, path))
 }
 
 func (handler *GinBasedWebApiHandler) DELETE(routerGroup *g.RouterGroup, path string, f func(ctx *g.Context)) {
@@ -66,10 +67,10 @@ func (handler *GinBasedWebApiHandler) DELETE(routerGroup *g.RouterGroup, path st
 	} else {
 		routerGroup.DELETE(path, handler.handleWithCors(f))
 	}
-	handler.addCorsHandler(path, http.MethodDelete)
+	handler.addCorsHandler(handler.getRouteBasePath(routerGroup, path))
 }
 
-func (handler *GinBasedWebApiHandler) addCorsHandler(path string, method string) {
+func (handler *GinBasedWebApiHandler) addCorsHandler(path string) {
 	if handler.AllowCors {
 		corsMethods := make([]string, 0)
 		routesInfo := handler.Router.Routes()
@@ -96,6 +97,7 @@ func (handler *GinBasedWebApiHandler) addCorsHandler(path string, method string)
 		if !optionHandlerExists {
 			corsMethods = append(corsMethods, http.MethodOptions)
 			// 4.1 Add Preflight Request Handler
+			handler.Router.OPTIONS(path, handler.handlePreflightReq)
 		}
 		// 5. Modify OPTION Methods Verbs list
 		handler.corsConfig[basePath] = corsMethods
@@ -144,4 +146,11 @@ func (handler *GinBasedWebApiHandler) getRouteInfo(ctx *g.Context) *g.RouteInfo 
 		}
 	}
 	return nil
+}
+
+func (handler *GinBasedWebApiHandler) getRouteBasePath(routerGroup *g.RouterGroup, path string) string {
+	if routerGroup == nil {
+		return path
+	}
+	return routerGroup.BasePath() + path
 }

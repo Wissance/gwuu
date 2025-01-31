@@ -17,17 +17,17 @@ const (
 func getRouteBasePath(path string) string {
 	trimmedPath := path
 	if path[len(path)-1] == '/' {
-		trimmedPath = path[0 : len(path)-2]
+		trimmedPath = path[0 : len(path)-1]
 	}
 
-	basePath := trimmedPath
 	basePathEndIndex := strings.LastIndex(trimmedPath, "/")
-	// pathVariableSignIndex := strings.LastIndex(trimmedPath, pathVariableSign)
-	if basePathEndIndex > 0 {
-		// if pathVariableSignIndex > basePathEndIndex
-		basePath = trimmedPath[0 : basePathEndIndex-1]
+	pathVariableSignIndex := strings.LastIndex(trimmedPath, pathVariableSign)
+	if basePathEndIndex > 0 && pathVariableSignIndex > 0 {
+		if pathVariableSignIndex > basePathEndIndex {
+			return trimmedPath[0:basePathEndIndex]
+		}
 	}
-	return basePath
+	return path
 }
 
 func join(values []string, separator string) string {

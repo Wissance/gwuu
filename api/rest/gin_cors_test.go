@@ -26,8 +26,8 @@ func TestGinHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 	handler.PUT(userRoutes, userResourceByIdPath, func(ctx *gin.Context) {})
 	handler.DELETE(userRoutes, userResourceByIdPath, func(ctx *gin.Context) {})
 
-	checkGinOptionRouteCors(t, handler.Router, realmResource, AnyOrigin, "*", "OPTIONS,GET")
-	checkGinOptionRouteCors(t, handler.Router, userResource, AnyOrigin, "*", "OPTIONS,GET,POST")
+	checkGinOptionRouteCors(t, handler.Router, realmResource+"/", AnyOrigin, "*", "OPTIONS,GET")
+	checkGinOptionRouteCors(t, handler.Router, userResource+"/", AnyOrigin, "*", "OPTIONS,GET,POST")
 }
 
 func checkGinOptionRouteCors(t *testing.T, router *gin.Engine, requestPath string, allowedOrigin string,
