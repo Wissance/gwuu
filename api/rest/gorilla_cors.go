@@ -6,37 +6,28 @@ import (
 	"net/http"
 )
 
-const (
-	// AccessControlAllowMethodsHeader - CORS Header that says what HTTP Methods are allowed to specific endpoint
-	AccessControlAllowMethodsHeader = "Access-Control-Allow-Methods"
-	AccessControlAllowOriginHeader  = "Access-Control-Allow-Origin"
-	AccessControlAllowHeadersHeader = "Access-Control-Allow-Headers"
-	// Value that allow all headers
-	AnyOrigin            = "*"
-	AllowAllHeaderValues = "*"
-	optionsRouteSuffix   = "opts"
-)
-
-type WebApiHandler struct {
+// MuxBasedWebApiHandler is a struct that encapsulates Router and CORS settings
+type MuxBasedWebApiHandler struct {
 	corsConfig map[string][]string
 	AllowCors  bool
 	Origin     string
 	Router     *m.Router
 }
 
-// NewWebApiHandler
-/* This function creates instance of WebApiHandler and inits properties with arguments values
+// NewMuxBasedWebApiHandler
+/* This function creates instance of MuxBasedWebApiHandler and inits properties with arguments values
  * Parameters:
  *    - allowCors - represents should be course configured (true) or not
  *    - origin - represents ip/domain or * (AnyOrigin) name which will be used response headers
  */
-func NewWebApiHandler(allowCors bool, origin string) *WebApiHandler {
-	handler := &WebApiHandler{
+func NewMuxBasedWebApiHandler(allowCors bool, origin string) *MuxBasedWebApiHandler {
+	handler := &MuxBasedWebApiHandler{
 		AllowCors:  allowCors,
 		Origin:     origin,
 		Router:     m.NewRouter(),
 		corsConfig: map[string][]string{},
 	}
+
 	if allowCors {
 		handler.Router.Use(m.CORSMethodMiddleware(handler.Router))
 	}
@@ -72,7 +63,7 @@ func addCorsHeaders(respWriter *http.ResponseWriter, origin string) {
 	(*respWriter).Header().Set(AccessControlAllowOriginHeader, origin)
 }
 
-func (handler *WebApiHandler) handlePreflightReq(respWriter http.ResponseWriter, request *http.Request) {
+func (handler *MuxBasedWebApiHandler) handlePreflightReq(respWriter http.ResponseWriter, request *http.Request) {
 	route := m.CurrentRoute(request)
 	if route != nil {
 		optionRouteName := route.GetName()
@@ -95,7 +86,7 @@ func join(values []string, separator string) string {
 }
 
 // handleWithCors function that adds CORS headers before handler func is called
-func (handler *WebApiHandler) handleWithCors(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
+func (handler *MuxBasedWebApiHandler) handleWithCors(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		if handler.AllowCors {
 			addCorsHeaders(&writer, handler.Origin)
@@ -117,7 +108,7 @@ func (handler *WebApiHandler) handleWithCors(f func(http.ResponseWriter, *http.R
  *     - f - handler function that handles request
  * Return created route like router.HandleFunc do
  */
-func (handler *WebApiHandler) HandleFunc(router *m.Router, path string, f func(http.ResponseWriter, *http.Request), handlerMethods ...string) *m.Route {
+func (handler *MuxBasedWebApiHandler) HandleFunc(router *m.Router, path string, f func(http.ResponseWriter, *http.Request), handlerMethods ...string) *m.Route {
 	// 1. Create Route ...
 	route := router.HandleFunc(path, handler.handleWithCors(f)).Methods(handlerMethods...)
 	actualRoutePath := path

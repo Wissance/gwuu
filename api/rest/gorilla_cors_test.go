@@ -12,7 +12,7 @@ import (
 func TestHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 
 	// Assign routes for resources with GET only and FULL CRUD
-	handler := NewWebApiHandler(true, AnyOrigin)
+	handler := NewMuxBasedWebApiHandler(true, AnyOrigin)
 	// Get only method
 	realmResource := "/api/realm/"
 	handler.HandleFunc(handler.Router, realmResource, func(writer http.ResponseWriter, request *http.Request) {
@@ -55,7 +55,7 @@ func TestHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 func TestHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 	// there is no sub router access yet ...
 	internalSubNet := "192.168.30.0"
-	handler := NewWebApiHandler(true, internalSubNet)
+	handler := NewMuxBasedWebApiHandler(true, internalSubNet)
 	service1Router := handler.Router.PathPrefix("/service1/").Subrouter()
 
 	objectResource := "/api/object/"
@@ -100,7 +100,7 @@ func TestHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 
 func TestHandleFuncForSubRouterSameName(t *testing.T) {
 	internalSubNet := "192.168.30.0"
-	handler := NewWebApiHandler(true, internalSubNet)
+	handler := NewMuxBasedWebApiHandler(true, internalSubNet)
 	objectResource := "/api/object/"
 	handler.HandleFunc(handler.Router, objectResource, func(writer http.ResponseWriter, request *http.Request) {
 	}, "GET")
