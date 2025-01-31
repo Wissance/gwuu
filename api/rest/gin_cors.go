@@ -3,7 +3,6 @@ package rest
 import (
 	g "github.com/gin-gonic/gin"
 	"net/http"
-	"strings"
 )
 
 type GinBasedWebApiHandler struct {
@@ -84,28 +83,14 @@ func (handler *GinBasedWebApiHandler) addCorsHandler(path string, method string)
 func (handler *GinBasedWebApiHandler) handleWithCors(f func(ctx *g.Context)) g.HandlerFunc {
 	return func(ctx *g.Context) {
 		if handler.AllowCors {
-			setCorsHeaders(ctx, handler.Origin)
+			handler.setCorsHeaders(ctx, handler.Origin)
 		}
 
 		f(ctx)
 	}
 }
 
-func getRouteBasePath(path string) string {
-	trimmedPath := path
-	if path[len(path)-1] == '/' {
-		trimmedPath = path[0 : len(path)-2]
-	}
-
-	basePath := trimmedPath
-	basePathEndIndex := strings.LastIndex(trimmedPath, "/")
-	if basePathEndIndex > 0 {
-		basePath = trimmedPath[0 : basePathEndIndex-1]
-	}
-	return basePath
-}
-
-func setCorsHeaders(ctx *g.Context, origin string) {
+func (handler *GinBasedWebApiHandler) setCorsHeaders(ctx *g.Context, origin string) {
 	ctx.Writer.Header().Set(AccessControlAllowHeadersHeader, AllowAllHeaderValues)
 	ctx.Writer.Header().Set(AccessControlAllowOriginHeader, origin)
 }
