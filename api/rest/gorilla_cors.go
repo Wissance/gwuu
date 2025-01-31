@@ -74,17 +74,6 @@ func (handler *MuxBasedWebApiHandler) handlePreflightReq(respWriter http.Respons
 	}
 }
 
-func join(values []string, separator string) string {
-	var line string
-	for i, v := range values {
-		line = line + v
-		if i != len(values)-1 {
-			line = line + separator
-		}
-	}
-	return line
-}
-
 // handleWithCors function that adds CORS headers before handler func is called
 func (handler *MuxBasedWebApiHandler) handleWithCors(f func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {

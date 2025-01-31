@@ -54,9 +54,11 @@ func (handler *GinBasedWebApiHandler) addCorsHandler(path string, method string)
 		corsMethods := make([]string, 0)
 		routesInfo := handler.Router.Routes()
 		// 1. Get base path /api/zone/realm and /api/zone/realm/1 has base -> /api/zone/
+		// todo(UMV): ???
 		basePath := getRouteBasePath(path)
 		for _, r := range routesInfo {
 			// 2. Collect all methods with same base path i.e. POST /api/zone/realm + 2 get methods /api/zone/realm and /api/zone/realm/1
+			// todo(UMV): ???
 			routeBasePath := getRouteBasePath(r.Path)
 			if basePath == routeBasePath {
 				corsMethods = append(corsMethods, r.Method)
@@ -67,6 +69,7 @@ func (handler *GinBasedWebApiHandler) addCorsHandler(path string, method string)
 		for route, _ := range handler.corsConfig {
 			if route == basePath {
 				optionHandlerExists = true
+				break
 			}
 		}
 		// 4. Create OPTION Handler if it does not exist
@@ -76,6 +79,18 @@ func (handler *GinBasedWebApiHandler) addCorsHandler(path string, method string)
 		}
 		// 5. Modify OPTION Methods Verbs list
 		handler.corsConfig[basePath] = corsMethods
+	}
+}
+
+func (handler *GinBasedWebApiHandler) handlePreflightReq(ctx *g.Context) {
+	route := handler.getRouteInfo(ctx)
+	//m.CurrentRoute(request)
+	if route != nil {
+		routeBasePath := getRouteBasePath(route.Path)
+		// stringFormatter.Format("{0}_{1}", request.URL.Path, optionsRouteSuffix)
+		methods := handler.corsConfig[routeBasePath]
+		methodsStr := join(methods, ",")
+		handler.enableCors(ctx, handler.Origin, methodsStr)
 	}
 }
 
@@ -93,4 +108,20 @@ func (handler *GinBasedWebApiHandler) handleWithCors(f func(ctx *g.Context)) g.H
 func (handler *GinBasedWebApiHandler) setCorsHeaders(ctx *g.Context, origin string) {
 	ctx.Writer.Header().Set(AccessControlAllowHeadersHeader, AllowAllHeaderValues)
 	ctx.Writer.Header().Set(AccessControlAllowOriginHeader, origin)
+}
+
+func (handler *GinBasedWebApiHandler) enableCors(ctx *g.Context, origin string, methods string) {
+	handler.setCorsHeaders(ctx, origin)
+	ctx.Writer.Header().Set(AccessControlAllowMethodsHeader, methods)
+}
+
+func (handler *GinBasedWebApiHandler) getRouteInfo(ctx *g.Context) *g.RouteInfo {
+	handlerName := ctx.HandlerName()
+	routesInfo := handler.Router.Routes()
+	for _, r := range routesInfo {
+		if r.Handler == handlerName {
+			return &r
+		}
+	}
+	return nil
 }

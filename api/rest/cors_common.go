@@ -26,3 +26,14 @@ func getRouteBasePath(path string) string {
 	}
 	return basePath
 }
+
+func join(values []string, separator string) string {
+	var line string
+	for i, v := range values {
+		line = line + v
+		if i != len(values)-1 {
+			line = line + separator
+		}
+	}
+	return line
+}
