@@ -64,7 +64,7 @@ func TestGinHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 
 	handler.POST(service2Router, classRootResource, func(ctx *gin.Context) {})
 
-	classByIdResource := "/api/class/{id}/"
+	classByIdResource := "/api/class/:id/"
 	handler.DELETE(service2Router, classByIdResource, func(ctx *gin.Context) {})
 
 	checkGinOptionRouteCors(t, handler.Router, "/service1"+objectResource, internalSubNet, "*", "OPTIONS,GET,POST")
