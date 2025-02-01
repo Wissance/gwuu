@@ -37,6 +37,13 @@ func TestGinHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 
 	checkGinRouteCors(t, handler.Router, "GET", userResource+"/", AnyOrigin)
 	checkGinRouteCors(t, handler.Router, "POST", userResource+"/", AnyOrigin)
+
+	userById := "/api/user/123/"
+	checkGinOptionRouteCors(t, handler.Router, userById, AnyOrigin, "*", "OPTIONS,GET,PUT,DELETE")
+
+	checkGinRouteCors(t, handler.Router, "GET", userById, AnyOrigin)
+	checkGinRouteCors(t, handler.Router, "PUT", userById, AnyOrigin)
+	checkGinRouteCors(t, handler.Router, "DELETE", userById, AnyOrigin)
 }
 
 func checkGinOptionRouteCors(t *testing.T, router *gin.Engine, requestPath string, allowedOrigin string,

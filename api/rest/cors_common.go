@@ -1,7 +1,5 @@
 package rest
 
-import "strings"
-
 const (
 	// AccessControlAllowMethodsHeader - CORS Header that says what HTTP Methods are allowed to specific endpoint
 	AccessControlAllowMethodsHeader = "Access-Control-Allow-Methods"
@@ -11,24 +9,7 @@ const (
 	AnyOrigin            = "*"
 	AllowAllHeaderValues = "*"
 	optionsRouteSuffix   = "opts"
-	pathVariableSign     = ":"
 )
-
-func getRouteBasePath(path string) string {
-	trimmedPath := path
-	if path[len(path)-1] == '/' {
-		trimmedPath = path[0 : len(path)-1]
-	}
-
-	basePathEndIndex := strings.LastIndex(trimmedPath, "/")
-	pathVariableSignIndex := strings.LastIndex(trimmedPath, pathVariableSign)
-	if basePathEndIndex > 0 && pathVariableSignIndex > 0 {
-		if pathVariableSignIndex > basePathEndIndex {
-			return trimmedPath[0:basePathEndIndex]
-		}
-	}
-	return path
-}
 
 func join(values []string, separator string) string {
 	var line string

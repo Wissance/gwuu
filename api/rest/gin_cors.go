@@ -74,21 +74,17 @@ func (handler *GinBasedWebApiHandler) addCorsHandler(path string, method string)
 	if handler.AllowCors {
 		corsMethods := make([]string, 0)
 		routesInfo := handler.Router.Routes()
-		// 1. Get base path /api/zone/realm and /api/zone/realm/1 has base -> /api/zone/
-		// todo(UMV): ???
-		basePath := getRouteBasePath(path)
+		// 1. Find route by appropriate path
 		for _, r := range routesInfo {
-			// 2. Collect all methods with same base path i.e. POST /api/zone/realm + 2 get methods /api/zone/realm and /api/zone/realm/1
-			// todo(UMV): ???
-			routeBasePath := getRouteBasePath(r.Path)
-			if basePath == routeBasePath {
+			// 2. Collect all methods with same path i.e. POST /api/zone/realm + 2 get methods /api/zone/realm and /api/zone/realm/1
+			if path == r.Path {
 				corsMethods = append(corsMethods, r.Method)
 			}
 		}
 		// 3. Check Cors Handler Configured
 		optionHandlerExists := false
 		for route, _ := range handler.corsConfig {
-			if route == basePath {
+			if route == path {
 				optionHandlerExists = true
 				break
 			}
@@ -100,17 +96,14 @@ func (handler *GinBasedWebApiHandler) addCorsHandler(path string, method string)
 			handler.Router.OPTIONS(path, handler.handlePreflightReq)
 		}
 		// 5. Modify OPTION Methods Verbs list
-		handler.corsConfig[basePath] = corsMethods
+		handler.corsConfig[path] = corsMethods
 	}
 }
 
 func (handler *GinBasedWebApiHandler) handlePreflightReq(ctx *g.Context) {
 	route := handler.getRouteInfo(ctx, http.MethodOptions)
-	//m.CurrentRoute(request)
 	if route != nil {
-		routeBasePath := getRouteBasePath(route.Path)
-		// stringFormatter.Format("{0}_{1}", request.URL.Path, optionsRouteSuffix)
-		methods := handler.corsConfig[routeBasePath]
+		methods := handler.corsConfig[route.Path]
 		methodsStr := join(methods, ",")
 		handler.enableCors(ctx, handler.Origin, methodsStr)
 	}
