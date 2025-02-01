@@ -82,18 +82,16 @@ func TestGinHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 	checkGinRouteCors(t, handler.Router, "DELETE", "/service2"+classById, internalSubNet)
 }
 
-/*func TestGinHandleFuncForSubRouterSameName(t *testing.T) {
+func TestGinHandleFuncForSubRouterSameName(t *testing.T) {
 	internalSubNet := "192.168.30.0"
 	handler := NewGinBasedWebApiHandler(true, internalSubNet)
 	objectResource := "/api/object/"
-	handler.HandleFunc(handler.Router, objectResource, func(writer http.ResponseWriter, request *http.Request) {
-	}, "GET")
-	service1Router := handler.Router.PathPrefix("/service1").Subrouter()
-	handler.HandleFunc(service1Router, objectResource, func(writer http.ResponseWriter, request *http.Request) {
-	}, "POST")
-	checkMuxOptionRouteCors(t, handler.Router, "/api/object/", internalSubNet, "*", "OPTIONS,GET")
-	checkMuxOptionRouteCors(t, handler.Router, "/service1/api/object/", internalSubNet, "*", "OPTIONS,POST")
-}*/
+	handler.GET(nil, objectResource, func(ctx *gin.Context) {})
+	service1Router := handler.Router.Group("/service1")
+	handler.POST(service1Router, objectResource, func(ctx *gin.Context) {})
+	checkGinOptionRouteCors(t, handler.Router, "/api/object/", internalSubNet, "*", "OPTIONS,GET")
+	checkGinOptionRouteCors(t, handler.Router, "/service1/api/object/", internalSubNet, "*", "OPTIONS,POST")
+}
 
 func checkGinOptionRouteCors(t *testing.T, router *gin.Engine, requestPath string, allowedOrigin string,
 	allowedHeader string, allowedMethods string) {
