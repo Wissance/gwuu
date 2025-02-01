@@ -95,7 +95,7 @@ func (handler *GinBasedWebApiHandler) addCorsHandler(path string) {
 		}
 		// 4. Create OPTION Handler if it does not exist
 		if !optionHandlerExists {
-			corsMethods = append(corsMethods, http.MethodOptions)
+			corsMethods = append([]string{http.MethodOptions}, corsMethods...)
 			// 4.1 Add Preflight Request Handler
 			handler.Router.OPTIONS(path, handler.handlePreflightReq)
 		}

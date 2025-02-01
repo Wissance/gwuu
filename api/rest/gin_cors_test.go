@@ -11,6 +11,7 @@ import (
 
 func TestGinHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 	handler := NewGinBasedWebApiHandler(true, AnyOrigin)
+	handler.Router.RedirectTrailingSlash = true
 
 	realmResource := "/api/realm"
 	realmRoutes := handler.Router.Group(realmResource)
