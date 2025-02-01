@@ -1,6 +1,6 @@
 module github.com/wissance/gwuu
 
-go 1.18
+go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.10.0

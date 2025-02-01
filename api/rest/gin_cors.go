@@ -3,6 +3,7 @@ package rest
 import (
 	g "github.com/gin-gonic/gin"
 	"net/http"
+	"net/url"
 )
 
 type GinBasedWebApiHandler struct {
@@ -131,7 +132,6 @@ func (handler *GinBasedWebApiHandler) enableCors(ctx *g.Context, origin string, 
 }
 
 func (handler *GinBasedWebApiHandler) getRouteInfo(ctx *g.Context, method string) *g.RouteInfo {
-	// handlerName := ctx.HandlerName()
 	path := ctx.FullPath()
 	routesInfo := handler.Router.Routes()
 	for _, r := range routesInfo {
@@ -142,9 +142,10 @@ func (handler *GinBasedWebApiHandler) getRouteInfo(ctx *g.Context, method string
 	return nil
 }
 
-func (handler *GinBasedWebApiHandler) getRouteBasePath(routerGroup *g.RouterGroup, path string) string {
+func (handler *GinBasedWebApiHandler) getRouteBasePath(routerGroup *g.RouterGroup, basePath string) string {
 	if routerGroup == nil {
-		return path
+		return basePath
 	}
-	return routerGroup.BasePath() + path
+	r, _ := url.JoinPath(routerGroup.BasePath(), basePath)
+	return r
 }
