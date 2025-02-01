@@ -1,9 +1,10 @@
-package gorm
+package gorm_test
 
 import (
 	"errors"
 	gg "github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
+	"github.com/wissance/gwuu/gorm"
 	g "gorm.io/gorm"
 	"testing"
 )
@@ -29,8 +30,8 @@ type User struct {
 
 func TestModelWithMultipleNestedTransactions(t *testing.T) {
 	cfg := g.Config{SkipDefaultTransaction: true}
-	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
-	db := OpenDb2(Postgres, connStr, true, true, &cfg, &postgresCollation)
+	connStr := gorm.BuildConnectionString(gorm.Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
+	db := gorm.OpenDb2(gorm.Postgres, connStr, true, true, &cfg, &postgresCollation)
 	assert.NotNil(t, db)
 
 	prepareDatabase(db)
@@ -71,15 +72,15 @@ func TestModelWithMultipleNestedTransactions(t *testing.T) {
 	db.Model(Role{}).Where("name = ?", "administrator").First(&role)
 	assert.True(t, role.ID > 0)
 	// Close
-	CloseDb(db)
+	gorm.CloseDb(db)
 	// Drop
-	DropDb(Postgres, connStr, &cfg)
+	gorm.DropDb(gorm.Postgres, connStr, &cfg)
 }
 
 func TestModelWithMultipleManualTransactions(t *testing.T) {
 	cfg := g.Config{SkipDefaultTransaction: true}
-	connStr := BuildConnectionString(Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
-	db := OpenDb2(Postgres, connStr, true, true, &cfg, &postgresCollation)
+	connStr := gorm.BuildConnectionString(gorm.Postgres, "127.0.0.1", 5432, "gwuu_tr_w_model_examples", dbUser, dbPassword, "disable")
+	db := gorm.OpenDb2(gorm.Postgres, connStr, true, true, &cfg, &postgresCollation)
 	assert.NotNil(t, db)
 
 	prepareDatabase(db)
@@ -108,9 +109,9 @@ func TestModelWithMultipleManualTransactions(t *testing.T) {
 	db.Model(Profile{}).Where("name = ?", adminProfile.Name).First(&profile)
 	assert.True(t, role.ID > 0)
 	// Close
-	CloseDb(db)
+	gorm.CloseDb(db)
 	// Drop
-	DropDb(Postgres, connStr, &cfg)
+	gorm.DropDb(gorm.Postgres, connStr, &cfg)
 }
 
 func prepareDatabase(db *g.DB) {

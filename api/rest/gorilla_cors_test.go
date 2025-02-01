@@ -1,8 +1,9 @@
-package rest
+package rest_test
 
 import (
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"github.com/wissance/gwuu/api/rest"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -12,7 +13,7 @@ import (
 func TestMuxHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 
 	// Assign routes for resources with GET only and FULL CRUD
-	handler := NewMuxBasedWebApiHandler(true, AnyOrigin)
+	handler := rest.NewMuxBasedWebApiHandler(true, rest.AnyOrigin)
 	// Get only method
 	realmResource := "/api/realm/"
 	handler.HandleFunc(handler.Router, realmResource, func(writer http.ResponseWriter, request *http.Request) {
@@ -37,25 +38,25 @@ func TestMuxHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 
 	}, "DELETE")
 
-	checkMuxOptionRouteCors(t, handler.Router, realmResource, AnyOrigin, "*", "OPTIONS,GET")
-	checkMuxOptionRouteCors(t, handler.Router, userResourceRoot, AnyOrigin, "*", "OPTIONS,GET,POST")
-	checkMuxRouteCors(t, handler.Router, "GET", realmResource, AnyOrigin)
+	checkMuxOptionRouteCors(t, handler.Router, realmResource, rest.AnyOrigin, "*", "OPTIONS,GET")
+	checkMuxOptionRouteCors(t, handler.Router, userResourceRoot, rest.AnyOrigin, "*", "OPTIONS,GET,POST")
+	checkMuxRouteCors(t, handler.Router, "GET", realmResource, rest.AnyOrigin)
 
-	checkMuxRouteCors(t, handler.Router, "GET", userResourceRoot, AnyOrigin)
-	checkMuxRouteCors(t, handler.Router, "POST", userResourceRoot, AnyOrigin)
+	checkMuxRouteCors(t, handler.Router, "GET", userResourceRoot, rest.AnyOrigin)
+	checkMuxRouteCors(t, handler.Router, "POST", userResourceRoot, rest.AnyOrigin)
 
 	userById := "/api/user/123/"
-	checkMuxOptionRouteCors(t, handler.Router, userById, AnyOrigin, "*", "OPTIONS,GET,PUT,DELETE")
+	checkMuxOptionRouteCors(t, handler.Router, userById, rest.AnyOrigin, "*", "OPTIONS,GET,PUT,DELETE")
 
-	checkMuxRouteCors(t, handler.Router, "GET", userById, AnyOrigin)
-	checkMuxRouteCors(t, handler.Router, "PUT", userById, AnyOrigin)
-	checkMuxRouteCors(t, handler.Router, "DELETE", userById, AnyOrigin)
+	checkMuxRouteCors(t, handler.Router, "GET", userById, rest.AnyOrigin)
+	checkMuxRouteCors(t, handler.Router, "PUT", userById, rest.AnyOrigin)
+	checkMuxRouteCors(t, handler.Router, "DELETE", userById, rest.AnyOrigin)
 }
 
 func TestMuxHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 	// there is no sub router access yet ...
 	internalSubNet := "192.168.30.0"
-	handler := NewMuxBasedWebApiHandler(true, internalSubNet)
+	handler := rest.NewMuxBasedWebApiHandler(true, internalSubNet)
 	service1Router := handler.Router.PathPrefix("/service1/").Subrouter()
 
 	objectResource := "/api/object/"
@@ -100,7 +101,7 @@ func TestMuxHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 
 func TestMuxHandleFuncForSubRouterSameName(t *testing.T) {
 	internalSubNet := "192.168.30.0"
-	handler := NewMuxBasedWebApiHandler(true, internalSubNet)
+	handler := rest.NewMuxBasedWebApiHandler(true, internalSubNet)
 	objectResource := "/api/object/"
 	handler.HandleFunc(handler.Router, objectResource, func(writer http.ResponseWriter, request *http.Request) {
 	}, "GET")
@@ -116,9 +117,9 @@ func checkMuxOptionRouteCors(t *testing.T, router *mux.Router, requestPath strin
 		Method: "OPTIONS"}
 	writer := httptest.NewRecorder()
 	router.ServeHTTP(writer, &request)
-	assert.Equal(t, allowedOrigin, writer.Header().Get(AccessControlAllowOriginHeader))
-	assert.Equal(t, allowedHeader, writer.Header().Get(AccessControlAllowHeadersHeader))
-	assert.Equal(t, allowedMethods, writer.Header().Get(AccessControlAllowMethodsHeader))
+	assert.Equal(t, allowedOrigin, writer.Header().Get(rest.AccessControlAllowOriginHeader))
+	assert.Equal(t, allowedHeader, writer.Header().Get(rest.AccessControlAllowHeadersHeader))
+	assert.Equal(t, allowedMethods, writer.Header().Get(rest.AccessControlAllowMethodsHeader))
 }
 
 func checkMuxRouteCors(t *testing.T, router *mux.Router, method string, requestPath string, allowedOrigin string) {
@@ -126,5 +127,5 @@ func checkMuxRouteCors(t *testing.T, router *mux.Router, method string, requestP
 		Method: method}
 	writer := httptest.NewRecorder()
 	router.ServeHTTP(writer, &request)
-	assert.Equal(t, allowedOrigin, writer.Header().Get(AccessControlAllowOriginHeader))
+	assert.Equal(t, allowedOrigin, writer.Header().Get(rest.AccessControlAllowOriginHeader))
 }
