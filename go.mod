@@ -4,7 +4,6 @@ go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/gorilla/mux v1.8.1
 	github.com/jinzhu/gorm v1.9.16
 	github.com/stretchr/testify v1.9.0

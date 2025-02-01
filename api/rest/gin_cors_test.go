@@ -1,8 +1,9 @@
-package rest
+package rest_test
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/wissance/gwuu/api/rest"
 	"github.com/wissance/gwuu/testingutils"
 	"net/http"
 	"net/http/httptest"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestGinHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
-	handler := NewGinBasedWebApiHandler(true, AnyOrigin)
+	handler := rest.NewGinBasedWebApiHandler(true, rest.AnyOrigin)
 	handler.Router.RedirectTrailingSlash = true
 
 	realmResource := "/api/realm"
@@ -30,26 +31,26 @@ func TestGinHandleFuncWithCorsWithAnyOrigin(t *testing.T) {
 	handler.DELETE(userRoutes, userResourceByIdPath, func(ctx *gin.Context) {})
 
 	// Requests with trailing slashes ...
-	checkGinOptionRouteCors(t, handler.Router, realmResource+"/", AnyOrigin, "*", "OPTIONS,GET")
-	checkGinOptionRouteCors(t, handler.Router, userResource+"/", AnyOrigin, "*", "OPTIONS,GET,POST")
+	checkGinOptionRouteCors(t, handler.Router, realmResource+"/", rest.AnyOrigin, "*", "OPTIONS,GET")
+	checkGinOptionRouteCors(t, handler.Router, userResource+"/", rest.AnyOrigin, "*", "OPTIONS,GET,POST")
 
-	checkGinRouteCors(t, handler.Router, "GET", realmResource+"/", AnyOrigin)
+	checkGinRouteCors(t, handler.Router, "GET", realmResource+"/", rest.AnyOrigin)
 
-	checkGinRouteCors(t, handler.Router, "GET", userResource+"/", AnyOrigin)
-	checkGinRouteCors(t, handler.Router, "POST", userResource+"/", AnyOrigin)
+	checkGinRouteCors(t, handler.Router, "GET", userResource+"/", rest.AnyOrigin)
+	checkGinRouteCors(t, handler.Router, "POST", userResource+"/", rest.AnyOrigin)
 
 	userById := "/api/user/123/"
-	checkGinOptionRouteCors(t, handler.Router, userById, AnyOrigin, "*", "OPTIONS,GET,PUT,DELETE")
+	checkGinOptionRouteCors(t, handler.Router, userById, rest.AnyOrigin, "*", "OPTIONS,GET,PUT,DELETE")
 
-	checkGinRouteCors(t, handler.Router, "GET", userById, AnyOrigin)
-	checkGinRouteCors(t, handler.Router, "PUT", userById, AnyOrigin)
-	checkGinRouteCors(t, handler.Router, "DELETE", userById, AnyOrigin)
+	checkGinRouteCors(t, handler.Router, "GET", userById, rest.AnyOrigin)
+	checkGinRouteCors(t, handler.Router, "PUT", userById, rest.AnyOrigin)
+	checkGinRouteCors(t, handler.Router, "DELETE", userById, rest.AnyOrigin)
 }
 
 func TestGinHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 	// there is no sub router access yet ...
 	internalSubNet := "192.168.30.0"
-	handler := NewGinBasedWebApiHandler(true, internalSubNet)
+	handler := rest.NewGinBasedWebApiHandler(true, internalSubNet)
 	service1Router := handler.Router.Group("/service1/")
 
 	objectResource := "/api/object/"
@@ -84,7 +85,7 @@ func TestGinHandleFuncForSubRouterAndSpecificOrigin(t *testing.T) {
 
 func TestGinHandleFuncForSubRouterSameName(t *testing.T) {
 	internalSubNet := "192.168.30.0"
-	handler := NewGinBasedWebApiHandler(true, internalSubNet)
+	handler := rest.NewGinBasedWebApiHandler(true, internalSubNet)
 	objectResource := "/api/object/"
 	handler.GET(nil, objectResource, func(ctx *gin.Context) {})
 	service1Router := handler.Router.Group("/service1")
@@ -99,10 +100,10 @@ func checkGinOptionRouteCors(t *testing.T, router *gin.Engine, requestPath strin
 		Method: "OPTIONS"}
 	writer := httptest.NewRecorder()
 	router.ServeHTTP(writer, &request)
-	assert.Equal(t, allowedOrigin, writer.Header().Get(AccessControlAllowOriginHeader))
-	assert.Equal(t, allowedHeader, writer.Header().Get(AccessControlAllowHeadersHeader))
+	assert.Equal(t, allowedOrigin, writer.Header().Get(rest.AccessControlAllowOriginHeader))
+	assert.Equal(t, allowedHeader, writer.Header().Get(rest.AccessControlAllowHeadersHeader))
 	expectedMethodsList := strings.Split(allowedMethods, ",")
-	actualMethodsList := strings.Split(writer.Header().Get(AccessControlAllowMethodsHeader), ",")
+	actualMethodsList := strings.Split(writer.Header().Get(rest.AccessControlAllowMethodsHeader), ",")
 	testingutils.CheckStrings(t, expectedMethodsList, actualMethodsList, false, true)
 }
 
@@ -111,5 +112,5 @@ func checkGinRouteCors(t *testing.T, router *gin.Engine, method string, requestP
 		Method: method}
 	writer := httptest.NewRecorder()
 	router.ServeHTTP(writer, &request)
-	assert.Equal(t, allowedOrigin, writer.Header().Get(AccessControlAllowOriginHeader))
+	assert.Equal(t, allowedOrigin, writer.Header().Get(rest.AccessControlAllowOriginHeader))
 }

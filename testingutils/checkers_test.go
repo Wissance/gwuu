@@ -1,55 +1,56 @@
-package testingutils
+package testingutils_test
 
 import (
 	"github.com/stretchr/testify/assert"
+	"github.com/wissance/gwuu/testingutils"
 	"testing"
 )
 
 func TestCheckStringsSuccessfulWithoutOrder(t *testing.T) {
 	arr1 := []string{"", ""}
 	arr2 := []string{"", ""}
-	checkResult, _ := CheckStrings(t, arr1, arr2, false, true)
+	checkResult, _ := testingutils.CheckStrings(t, arr1, arr2, false, true)
 	assert.True(t, checkResult)
 
 	arr1 = []string{"English", "Русский"}
 	arr2 = []string{"English", "Русский"}
-	checkResult, _ = CheckStrings(t, arr1, arr2, false, true)
+	checkResult, _ = testingutils.CheckStrings(t, arr1, arr2, false, true)
 	assert.True(t, checkResult)
 
 	arr1 = []string{"TextOne", "ТекстДва", "TextThree", "TextFore"}
 	arr2 = []string{"TextFore", "ТекстДва", "TextOne", "TextThree"}
-	checkResult, _ = CheckStrings(t, arr1, arr2, false, true)
+	checkResult, _ = testingutils.CheckStrings(t, arr1, arr2, false, true)
 	assert.True(t, checkResult)
 }
 
 func TestCheckStringsSuccessfulWithOrder(t *testing.T) {
 	arr1 := []string{"", ""}
 	arr2 := []string{"", ""}
-	checkResult, _ := CheckStrings(t, arr1, arr2, true, true)
+	checkResult, _ := testingutils.CheckStrings(t, arr1, arr2, true, true)
 	assert.True(t, checkResult)
 
 	arr1 = []string{"TextOne", "ТекстДва", "TextThree", "TextFore"}
 	arr2 = []string{"TextOne", "ТекстДва", "TextThree", "TextFore"}
-	checkResult, _ = CheckStrings(t, arr1, arr2, false, true)
+	checkResult, _ = testingutils.CheckStrings(t, arr1, arr2, false, true)
 	assert.True(t, checkResult)
 }
 
 func TestCheckStringsFailsWithoutOrder(t *testing.T) {
 	arr1 := []string{"", ""}
 	arr2 := []string{" ", " "}
-	checkResult, msg := CheckStrings(t, arr1, arr2, false, false)
+	checkResult, msg := testingutils.CheckStrings(t, arr1, arr2, false, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, msg)
 
 	arr1 = []string{"english", "Русский"}
 	arr2 = []string{"English", "русский"}
-	checkResult, msg = CheckStrings(t, arr1, arr2, false, false)
+	checkResult, msg = testingutils.CheckStrings(t, arr1, arr2, false, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, msg)
 
 	arr1 = []string{"TextOne", "ТекстДва", "TextThree", "TextFore"}
 	arr2 = []string{"TextFore", "ТекстДва", "TextOne"}
-	checkResult, msg = CheckStrings(t, arr1, arr2, false, false)
+	checkResult, msg = testingutils.CheckStrings(t, arr1, arr2, false, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, msg)
 }
@@ -57,7 +58,7 @@ func TestCheckStringsFailsWithoutOrder(t *testing.T) {
 func TestCheckStringsFailsWithOrder(t *testing.T) {
 	arr1 := []string{"TextOne", "ТекстДва", "TextThree", "TextFore"}
 	arr2 := []string{"TextFore", "ТекстДва", "TextOne", "TextThree"}
-	checkResult, _ := CheckStrings(t, arr1, arr2, true, false)
+	checkResult, _ := testingutils.CheckStrings(t, arr1, arr2, true, false)
 	assert.False(t, checkResult)
 }
 
@@ -72,7 +73,7 @@ func TestCheckIntegersSuccessfulWithoutOrder(t *testing.T) {
 	arr2[1] = 0
 	arr2[2] = 0
 
-	checkResult, err := CheckNumeric[int](t, arr1, arr2, false, true)
+	checkResult, err := testingutils.CheckNumeric[int](t, arr1, arr2, false, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 
@@ -89,7 +90,7 @@ func TestCheckIntegersFailsWithoutOrder(t *testing.T) {
 	arr2[1] = 0
 	arr2[2] = 0
 
-	checkResult, err := CheckNumeric[int](t, arr1, arr2, false, false)
+	checkResult, err := testingutils.CheckNumeric[int](t, arr1, arr2, false, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 
@@ -106,7 +107,7 @@ func TestCheckIntegersSuccessfulWithOrder(t *testing.T) {
 	arr2[1] = 222
 	arr2[2] = 333
 
-	checkResult, err := CheckNumeric[int64](t, arr1, arr2, true, true)
+	checkResult, err := testingutils.CheckNumeric[int64](t, arr1, arr2, true, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 }
@@ -122,7 +123,7 @@ func TestCheckIntegersFailsWithOrder(t *testing.T) {
 	arr2[1] = 222
 	arr2[2] = 333
 
-	checkResult, err := CheckNumeric[uint](t, arr1, arr2, true, false)
+	checkResult, err := testingutils.CheckNumeric[uint](t, arr1, arr2, true, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
@@ -138,7 +139,7 @@ func TestCheckFloat32SuccessfulWithOrder(t *testing.T) {
 	arr2[1] = 99
 	arr2[2] = 55.6
 
-	checkResult, err := CheckFloats(t, arr1, arr2, 0.5, true, true)
+	checkResult, err := testingutils.CheckFloats(t, arr1, arr2, 0.5, true, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 }
@@ -154,7 +155,7 @@ func TestCheckFloat32FailsWithOrder(t *testing.T) {
 	arr2[1] = 99
 	arr2[2] = 55.6
 
-	checkResult, err := CheckFloats(t, arr1, arr2, 0.5, true, false)
+	checkResult, err := testingutils.CheckFloats(t, arr1, arr2, 0.5, true, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
@@ -170,7 +171,7 @@ func TestCheckFloat32SuccessfulWithoutOrder(t *testing.T) {
 	arr2[1] = 199.99
 	arr2[2] = 129.123
 
-	checkResult, err := CheckFloats(t, arr1, arr2, 0.5, false, true)
+	checkResult, err := testingutils.CheckFloats(t, arr1, arr2, 0.5, false, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 }
@@ -186,7 +187,7 @@ func TestCheckFloat32FailsWithoutOrder(t *testing.T) {
 	arr2[1] = 299.99
 	arr2[2] = 129.123
 
-	checkResult, err := CheckFloats(t, arr1, arr2, 0.5, true, false)
+	checkResult, err := testingutils.CheckFloats(t, arr1, arr2, 0.5, true, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
@@ -202,7 +203,7 @@ func TestCheckFloat64SuccessfulWithOrder(t *testing.T) {
 	arr2[1] = 99
 	arr2[2] = 55.6
 
-	checkResult, err := CheckFloats[float32](t, arr1, arr2, 0.5, true, true)
+	checkResult, err := testingutils.CheckFloats[float32](t, arr1, arr2, 0.5, true, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 }
@@ -218,7 +219,7 @@ func TestCheckFloat64FailsWithOrder(t *testing.T) {
 	arr2[1] = 99
 	arr2[2] = 55.6
 
-	checkResult, err := CheckFloats[float64](t, arr1, arr2, 0.5, true, false)
+	checkResult, err := testingutils.CheckFloats[float64](t, arr1, arr2, 0.5, true, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
@@ -234,7 +235,7 @@ func TestCheckFloat64SuccessfulWithoutOrder(t *testing.T) {
 	arr2[1] = 199.99
 	arr2[2] = 129.123
 
-	checkResult, err := CheckFloats[float64](t, arr1, arr2, 0.5, false, true)
+	checkResult, err := testingutils.CheckFloats[float64](t, arr1, arr2, 0.5, false, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 }
@@ -250,7 +251,7 @@ func TestCheckFloat64FailsWithoutOrder(t *testing.T) {
 	arr2[1] = 299.99
 	arr2[2] = 129.123
 
-	checkResult, err := CheckFloats(t, arr1, arr2, 0.5, true, false)
+	checkResult, err := testingutils.CheckFloats(t, arr1, arr2, 0.5, true, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
@@ -266,7 +267,7 @@ func TestCheckComplex64SuccessfulWithOrder(t *testing.T) {
 	arr2[1] = complex(99, 100.91)
 	arr2[2] = complex(55.6, 66.88)
 
-	checkResult, err := CheckComplexes(t, arr1, arr2, 0.5, true, true)
+	checkResult, err := testingutils.CheckComplexes(t, arr1, arr2, 0.5, true, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 }
@@ -282,7 +283,7 @@ func TestCheckComplex64FailsWithOrder(t *testing.T) {
 	arr2[1] = complex(99, 100.91)
 	arr2[2] = complex(55.6, 66.88)
 
-	checkResult, err := CheckComplexes(t, arr1, arr2, 0.5, true, false)
+	checkResult, err := testingutils.CheckComplexes(t, arr1, arr2, 0.5, true, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }
@@ -298,7 +299,7 @@ func TestCheckComplex64SuccessfulWithoutOrder(t *testing.T) {
 	arr2[1] = complex(99, 100.91)
 	arr2[2] = complex(55.6, 66.88)
 
-	checkResult, err := CheckComplexes(t, arr1, arr2, 0.5, false, true)
+	checkResult, err := testingutils.CheckComplexes(t, arr1, arr2, 0.5, false, true)
 	assert.True(t, checkResult)
 	assert.Empty(t, err)
 }
@@ -314,7 +315,7 @@ func TestCheckComplex64FailsWithoutOrder(t *testing.T) {
 	arr2[1] = complex(99, 100.91)
 	arr2[2] = complex(55.6, 66.88)
 
-	checkResult, err := CheckComplexes[complex64](t, arr1, arr2, 0.5, false, false)
+	checkResult, err := testingutils.CheckComplexes[complex64](t, arr1, arr2, 0.5, false, false)
 	assert.False(t, checkResult)
 	assert.NotEmpty(t, err)
 }

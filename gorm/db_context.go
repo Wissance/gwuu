@@ -149,7 +149,7 @@ func OpenDb2(dialect SqlDialect, connStr string, create bool, check bool, option
 		}
 	} else {
 		if !dbCheckResult {
-			systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
+			systemDbConnStr, dbName := CreateSystemDbConnStr(dialect, &connStr)
 			return createDb(dialect, &systemDbConnStr, &connStr, &dbName, options, collation)
 		}
 	}
@@ -207,7 +207,7 @@ func CloseDb(db *g.DB) bool {
  *    - connStr - full connection string
  */
 func DropDb(dialect SqlDialect, connStr string, options *g.Config) bool {
-	systemDbConnStr, dbName := createSystemDbConnStr(dialect, &connStr)
+	systemDbConnStr, dbName := CreateSystemDbConnStr(dialect, &connStr)
 	return DropDb2(dialect, systemDbConnStr, dbName, options)
 }
 
@@ -235,7 +235,7 @@ func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string, options 
 	return true
 }
 
-// createSystemDbConnStr
+// CreateSystemDbConnStr
 /* Function that creates system database connection string from target database connection string
  * Create system db conn string using connection string to open target database, but database could not exist
  * therefore in some cases we have to create it (if we pass create=true to any OpenDb function).
@@ -245,7 +245,7 @@ func DropDb2(dialect SqlDialect, systemDbConnStr string, dbName string, options 
  *     - connStr - connection string to other database
  * Return tuple of systemDbConnStr, dbName
  */
-func createSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string) {
+func CreateSystemDbConnStr(dialect SqlDialect, connStr *string) (string, string) {
 	connStrCopy := *connStr
 	if dialect == Postgres {
 		// replace dbname={
